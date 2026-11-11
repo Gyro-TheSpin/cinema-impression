@@ -129,13 +129,7 @@ def impression_html(no, text):
     if not text:
         return para(text)
     blocks = [b.strip() for b in regroup(text, per=2, min_split=230).split("\n\n") if b.strip()]
-    html_blocks = []
-    spot = os.path.join(ROOT, "images", f"spot-{no}.svg")
-    for i, b in enumerate(blocks):
-        html_blocks.append(para(b))
-        if i == 2 and os.path.exists(spot) and len(blocks) >= 6:
-            html_blocks.append(f'<img class="spot" src="../images/spot-{no}.svg" alt="" loading="lazy">')
-    return "\n".join(html_blocks)
+    return "\n".join(para(b) for b in blocks)
 
 def load_films():
     with open(os.path.join(ROOT, "data.js"), encoding="utf-8") as f:
