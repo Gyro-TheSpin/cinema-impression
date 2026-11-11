@@ -91,20 +91,11 @@ ul.queue li:hover{background:var(--panel)}
 footer.site{border-top:1px solid var(--line);margin-top:80px;padding:34px 20px 46px;text-align:center;color:var(--faint);font-size:13px}
 footer.site .brand{font-size:17px}
 
-dialog{border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:20px;max-width:680px;width:calc(100% - 32px);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.6)}
-dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
-.dlg-in{padding:30px 30px 34px;max-height:82vh;overflow:auto}
-.dlg-in .order{font-size:12px;letter-spacing:.22em;color:var(--accent);font-weight:900}
-.dlg-in h3{font-family:var(--serif);font-size:28px;font-weight:800;line-height:1.4;margin:6px 0 2px}
-.dlg-in .meta{color:var(--muted);font-size:14px;margin-bottom:18px}
-.dlg-in h4{font-family:var(--serif);font-size:17px;margin:22px 0 8px;padding-left:10px;border-left:3px solid var(--accent)}
-.dlg-in p{color:#d8d1bf;font-size:15px}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:14px}
 .facts dt{color:var(--faint);font-size:12px;letter-spacing:.1em}
 .facts dd{font-weight:500}
 .empty{border:1px dashed var(--accent2);border-radius:12px;padding:16px 18px;color:var(--accent);font-size:14px;background:rgba(226,164,88,.05)}
 .src{font-size:12px;color:var(--faint);margin-top:8px}
-.dlg-close{position:sticky;top:0;float:right;background:var(--panel2);border:1px solid var(--line);color:var(--ink);width:38px;height:38px;border-radius:50%;font-size:17px;cursor:pointer}
 @media(max-width:640px){.facts{grid-template-columns:1fr}}
 </style>
 </head>
@@ -161,13 +152,6 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
   <p style="margin-top:8px">映画の感想と考察を、1日1本ずつ。作品情報の出典は各記事に明記しています。</p>
 </footer>
 
-<dialog id="dlg">
-  <div class="dlg-in">
-    <button class="dlg-close" id="dlgClose" type="button" aria-label="閉じる">×</button>
-    <div id="dlgBody"></div>
-  </div>
-</dialog>
-
 <script src="data.js"></script>
 <script src="drafts.js"></script>
 <script>
@@ -188,7 +172,7 @@ const nextWrap = $("#nextCards");
 FILMS.slice(0,3).forEach(f => {
   const el = document.createElement("article");
   el.className = "card"; el.innerHTML = cardHTML(f);
-  el.addEventListener("click", () => openFilm(f.no));
+  el.addEventListener("click", () => { location.href = "articles/" + f.no + ".html"; });
   nextWrap.appendChild(el);
 });
 
@@ -212,7 +196,11 @@ function renderQueue(){
     const chip = dd && dd.published ? '<span class="tag draft q-chip">公開中</span>' : dd ? '<span class="tag draft q-chip">レビューあり</span>' : '<span class="tag q-chip">準備中</span>';
     li.innerHTML = `
       <span class="q-main"><span class="q-title">${esc(f.title)}</span><br><span class="q-sub">${f.year}年製作</span></span>${chip}`;
-    li.addEventListener("click", () => openFilm(f.no));
+    if (dd){
+      li.addEventListener("click", () => { location.href = "articles/" + f.no + ".html"; });
+    } else {
+      li.style.cursor = "default";
+    }
     ul.appendChild(li);
   });
   $("#countNote").textContent = `${list.length}作品中 ${Math.min(shown, list.length)}作品を表示`;
@@ -223,28 +211,6 @@ $("#q").addEventListener("input", () => { shown = 60; renderQueue(); });
 sel.addEventListener("change", () => { shown = 60; renderQueue(); });
 renderQueue();
 
-const dlg = $("#dlg");
-function openFilm(no){
-  const f = byNo[no]; const d = DRAFTS[no];
-  let h = `<div class="order">${d && d.date ? esc(d.date) + ' 公開' : 'REVIEW'}</div><h3>${esc(f.title)}</h3><div class="meta">${f.year}年製作</div>`;
-  if (d){
-    h += `<h4>あらすじ・概要</h4><p>${esc(d.overview)}</p>
-      <div class="src">出典：<a href="${d.source[1]}" target="_blank" rel="noopener">${esc(d.source[0])}</a>（事実情報を整理して記載）</div>
-      <h4>作品情報</h4><dl class="facts">${d.facts.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`;
-  } else {
-    h += `<h4>あらすじ・概要</h4><div class="empty">この作品の記事は準備中です。</div>`;
-  }
-  h += (d && d.impression)
-    ? `<h4>感想</h4><p>${esc(d.impression).replace(/\n/g, '<br>')}</p>`
-    : `<h4>感想</h4><div class="empty">感想は準備中です。</div>`;
-  h += (d && d.analysis)
-    ? `<h4>考察</h4><p>${esc(d.analysis).replace(/\n/g, '<br>')}</p>`
-    : `<h4>考察</h4><div class="empty">考察は準備中です。</div>`;
-  $("#dlgBody").innerHTML = h;
-  dlg.showModal();
-}
-$("#dlgClose").addEventListener("click", () => dlg.close());
-dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 </script>
 </body>
 </html>

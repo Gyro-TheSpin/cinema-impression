@@ -76,6 +76,8 @@ def main():
             w = csv.DictWriter(f, fieldnames=fieldnames)
             w.writeheader()
             w.writerows(rows)
+    import build_pages
+    build_pages.build_all()
     print(f"#{args.no} を {date} 付で公開状態にしました")
 
 

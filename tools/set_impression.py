@@ -77,6 +77,8 @@ def main():
     with open(drafts_path, "w", encoding="utf-8") as f:
         json.dump(drafts, f, ensure_ascii=False, indent=2)
     emit_js(drafts)
+    import build_pages
+    build_pages.build_all()
     print(f"#{args.no} に感想（{len(entry['impression'])}字）"
           + (f"・考察（{len(entry['analysis'])}字）" if entry.get("analysis") else "")
           + "を反映しました")

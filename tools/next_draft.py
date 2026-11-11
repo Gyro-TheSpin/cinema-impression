@@ -170,6 +170,9 @@ def main():
         )
         f.write("const DRAFTS = " + json.dumps(drafts, ensure_ascii=False, indent=2) + ";\n")
     print("drafts.json / drafts.js / queue を更新しました")
+    import build_pages
+    made = build_pages.build_all()
+    print(f"記事ページを生成しました: {len(made)}本")
 
 
 if __name__ == "__main__":
