@@ -73,8 +73,7 @@ TEMPLATE = """<!DOCTYPE html>
 <img class="divider" src="../images/divider.svg" alt="">
 <h2>感想</h2>
 {impression}
-<h2>考察</h2>
-{analysis}
+{analysis_block}
 </main>
 <footer class="site">シネマインプレッション<br>映画の感想と考察を、1日1本ずつ。</footer>
 </body>
@@ -130,7 +129,7 @@ def build_all():
             source_url=esc(d["source"][1]) if d.get("source") else "#",
             facts=facts,
             impression=para(d.get("impression")),
-            analysis=para(d.get("analysis")),
+            analysis_block=("<h2>考察</h2>\n" + para(d.get("analysis"))) if (d.get("analysis") or "").strip() else "",
             spoiler=para(d.get("spoiler_overview")),
         )
         with open(os.path.join(outdir, f"{no}.html"), "w", encoding="utf-8") as f:
