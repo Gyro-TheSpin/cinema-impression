@@ -53,7 +53,12 @@ TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}（{year}）の感想と考察｜山田太郎シネマ</title>
-<meta name="description" content="{title}（{year}年）のあらすじ、感想と考察。">
+<meta name="description" content="{title}（{year}年）のあらすじ、作品情報、感想と考察。">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="山田太郎シネマ">
+<meta property="og:title" content="{title}（{year}）の感想と考察｜山田太郎シネマ">
+<meta property="og:description" content="{title}（{year}年）のあらすじ、作品情報、感想と考察。">
+<meta property="og:url" content="https://gyro-thespin.github.io/cinema-impression/articles/{no}.html">
 <style>{css}</style>
 </head>
 <body>
@@ -78,7 +83,7 @@ TEMPLATE = """<!DOCTYPE html>
 {impression}
 {analysis_block}
 </main>
-<footer class="site">山田太郎シネマ<br>映画の感想と考察を、1日1本ずつ。</footer>
+<footer class="site">山田太郎シネマ<br>映画の感想と考察を、1日1本ずつ。<br><a href="../privacy.html">プライバシーポリシー</a></footer>
 </body>
 </html>
 """
@@ -164,6 +169,7 @@ def build_all():
         if os.path.exists(os.path.join(ROOT, "images", f"{no}.svg")):
             hero = f'<img class="hero" src="../images/{no}.svg" alt="{esc(film["title"])}のイラスト">'
         page = TEMPLATE.format(
+            no=no,
             hero=hero,
             title=esc(film["title"]),
             year=film["year"],
@@ -180,6 +186,13 @@ def build_all():
         with open(os.path.join(outdir, f"{no}.html"), "w", encoding="utf-8") as f:
             f.write(page)
         made.append(no)
+    base = "https://gyro-thespin.github.io/cinema-impression/"
+    urls = [base, base + "privacy.html"] + [base + f"articles/{n}.html" for n in sorted(made)]
+    sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    sm += [f"<url><loc>{u}</loc></url>" for u in urls]
+    sm.append("</urlset>")
+    with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write("\n".join(sm) + "\n")
     return made
 
 
