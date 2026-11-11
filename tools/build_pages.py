@@ -35,6 +35,7 @@ p{color:#d8d1bf;font-size:16px}
 .facts dt{color:var(--faint);font-size:12px}
 .facts dd{color:var(--ink)}
 .empty{border:1px dashed var(--accent2);border-radius:12px;padding:16px 18px;color:var(--accent);font-size:14px;background:rgba(226,164,88,.05)}
+.warn{color:#d98c8c;font-size:13px;margin-bottom:10px}
 footer.site{border-top:1px solid var(--line);padding:30px 20px 40px;text-align:center;color:var(--faint);font-size:13px}
 @media(max-width:640px){h1{font-size:26px}.facts{grid-template-columns:1fr}}
 """
@@ -57,13 +58,17 @@ TEMPLATE = """<!DOCTYPE html>
 <div class="meta">{year}年製作</div>
 <h2>あらすじ・概要</h2>
 <p>{overview}</p>
-<div class="src">出典：<a href="{source_url}" target="_blank" rel="noopener">{source_name}</a>（事実情報を整理して記載）</div>
+<div class="src">出典：<a href="{source_url}">{source_name}</a>（事実情報を整理して記載）</div>
 <h2>作品情報</h2>
 <dl class="facts">{facts}</dl>
 <h2>感想</h2>
 {impression}
 <h2>考察</h2>
 {analysis}
+<h2>ネタバレあり｜詳しいあらすじ</h2>
+<p class="warn">※ここから先は結末まで含むネタバレです。未見の方はご注意ください。</p>
+{spoiler}
+<div class="src">あらすじの出典：<a href="{source_url}" target="_blank" rel="noopener">{source_name}</a>（事実情報を整理して記載）</div>
 </main>
 <footer class="site">シネマインプレッション<br>映画の感想と考察を、1日1本ずつ。</footer>
 </body>
@@ -113,6 +118,7 @@ def build_all():
             facts=facts,
             impression=para(d.get("impression")),
             analysis=para(d.get("analysis")),
+            spoiler=para(d.get("spoiler_overview")),
         )
         with open(os.path.join(outdir, f"{no}.html"), "w", encoding="utf-8") as f:
             f.write(page)

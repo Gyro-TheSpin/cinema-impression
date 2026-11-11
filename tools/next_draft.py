@@ -71,6 +71,80 @@ def wiki_summary(title, year):
     return {"extract": extract, "url": page.get("fullurl", ""), "page_title": page.get("title", "")}
 
 
+NEXT_HEADINGS = ["登場人物", "キャスト", "声の出演", "スタッフ", "制作", "製作", "公開", "評価", "興行成績", "脚注", "出典", "関連項目", "外部リンク", "主題歌", "音楽"]
+
+
+def wiki_plot(title):
+    """Wikipedia全文から「あらすじ」セクション（結末まで含む）を切り出す。見つからなければ None。"""
+    api = "https://ja.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "prop": "extracts",
+        "explaintext": "1",
+        "format": "json",
+        "generator": "search",
+        "gsrsearch": f"{title} 映画",
+        "gsrlimit": "1",
+    }
+    req = urllib.request.Request(
+        api + "?" + urllib.parse.urlencode(params),
+        headers={"User-Agent": "movie-blog-draft/1.0 (personal project)"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.load(r)
+    except Exception:
+        return None
+    pages = (data.get("query") or {}).get("pages") or {}
+    if not pages:
+        return None
+    text = next(iter(pages.values())).get("extract") or ""
+    lines = [ln.strip() for ln in text.splitlines()]
+    start = None
+    for i, ln in enumerate(lines):
+        if ln in ("あらすじ", "ストーリー", "物語", "プロット"):
+            start = i + 1
+            break
+    if start is None:
+        return None
+    body = []
+    for ln in lines[start:]:
+        if ln in NEXT_HEADINGS:
+            break
+        if ln:
+            body.append(ln)
+    plot = "".join(body).strip()
+    return plot[:4000] if len(plot) >= 80 else None
+
+
+def summarize_spoiler_with_gemini(title, plot):
+    """GEMINI_API_KEY があるとき、結末まで含む詳しいあらすじを事実だけで整形する。"""
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key or not plot:
+        return None
+    prompt = (
+        "次のWikipediaのあらすじをもとに、映画『"
+        + title
+        + "』の詳しいあらすじを600字程度の日本語で書いてください。"
+        "結末まで含めてよい（ネタバレ記事用）。事実を変えたり、書かれていない内容を足したりしないこと。"
+        "感想や評価は書かないこと。\n\n"
+        + plot[:4000]
+    )
+    body = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode("utf-8")
+    req = urllib.request.Request(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + key,
+        data=body,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            data = json.load(r)
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except Exception as e:
+        print(f"  Gemini整形（ネタバレ）に失敗（原文で代替）: {e}", file=sys.stderr)
+        return None
+
+
 def summarize_with_gemini(title, extract):
     """GEMINI_API_KEY があるときだけ、事実を変えずに概要を短く整形する。失敗したら None。"""
     key = os.environ.get("GEMINI_API_KEY")
@@ -150,11 +224,17 @@ def main():
         overview = summarize_with_gemini(t["title"], info["extract"]) or first_sentences(
             info["extract"]
         )
-        drafts[str(t["queue_no"])] = {
+        draft = {
             "overview": overview,
             "facts": [["製作年", f"{t['year']}年"]],
             "source": [f"Wikipedia「{info['page_title']}」", info["url"]],
         }
+        plot = wiki_plot(t["title"])
+        if plot:
+            draft["spoiler_overview"] = (
+                summarize_spoiler_with_gemini(t["title"], plot) or first_sentences(plot, limit=1500)
+            )
+        drafts[str(t["queue_no"])] = draft
         t["status"] = "drafted"
         print(f"  下書きを作成: {t['title']}")
 
