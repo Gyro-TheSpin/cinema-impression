@@ -29,7 +29,8 @@ header.site{border-bottom:1px solid var(--line);padding:16px 20px}
 h1{font-family:var(--serif);font-size:36px;font-weight:800;line-height:1.45;margin:8px 0 4px}
 .meta{color:var(--muted);font-size:15px;margin-bottom:10px}
 h2{font-family:var(--serif);font-size:22px;margin:30px 0 10px;padding-left:10px;border-left:3px solid var(--accent)}
-p{color:#d8d1bf;font-size:17px}
+p{color:#d8d1bf;font-size:17px;margin-bottom:15px}
+p strong{color:var(--ink)}
 .src{font-size:13px;color:var(--faint);margin-top:8px}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;font-size:15px}
 .facts dt{color:var(--faint);font-size:13px}
@@ -88,7 +89,10 @@ def esc(s):
 def para(text):
     if not text:
         return '<div class="empty">準備中です。</div>'
-    return "<p>" + esc(text).replace("\n", "<br>") + "</p>"
+    body = esc(text)
+    body = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", body)
+    paras = [p.strip() for p in body.split("\n\n") if p.strip()]
+    return "\n".join("<p>" + p.replace("\n", "<br>") + "</p>" for p in paras)
 
 
 def load_films():
