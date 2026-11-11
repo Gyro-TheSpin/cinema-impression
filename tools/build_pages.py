@@ -52,12 +52,12 @@ TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title}（{year}）の感想と考察｜シネマインプレッション</title>
+<title>{title}（{year}）の感想と考察｜山田太郎シネマ</title>
 <meta name="description" content="{title}（{year}年）のあらすじ、感想と考察。">
 <style>{css}</style>
 </head>
 <body>
-<header class="site"><a class="brand" href="../index.html">シネマ<b>インプレッション</b></a></header>
+<header class="site"><a class="brand" href="../index.html">山田太郎<b>シネマ</b></a></header>
 <main class="wrap">
 <a class="back" href="../index.html">← トップへ戻る</a>
 <div class="date">{date}</div>
@@ -78,7 +78,7 @@ TEMPLATE = """<!DOCTYPE html>
 {impression}
 {analysis_block}
 </main>
-<footer class="site">シネマインプレッション<br>映画の感想と考察を、1日1本ずつ。</footer>
+<footer class="site">山田太郎シネマ<br>映画の感想と考察を、1日1本ずつ。</footer>
 </body>
 </html>
 """
