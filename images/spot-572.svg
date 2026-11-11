@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" role="img" aria-label="スープとスプーンの小さなイラスト">
+<rect width="200" height="150" fill="#14120e"/>
+<path d="M78 44 q5 -10 0 -20 M100 46 q5 -10 0 -20 M122 44 q5 -10 0 -20" stroke="#a89e83" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M45 62 h110 a55 40 0 0 1 -110 0 z" fill="#191611" stroke="#e2a458" stroke-width="3"/>
+<ellipse cx="100" cy="62" rx="55" ry="9" fill="#e2a458" opacity="0.85"/>
+<line x1="70" y1="118" x2="130" y2="118" stroke="#8a6a35" stroke-width="4" stroke-linecap="round"/>
+<g transform="rotate(24 158 88)">
+<ellipse cx="158" cy="66" rx="10" ry="14" fill="none" stroke="#f2ecdc" stroke-width="3"/>
+<line x1="158" y1="80" x2="158" y2="112" stroke="#f2ecdc" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+</svg>

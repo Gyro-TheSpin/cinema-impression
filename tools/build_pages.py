@@ -40,6 +40,7 @@ p strong{color:var(--ink)}
 h2.spaced{margin-top:58px}
 .hero{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);margin:16px 0 4px;display:block}
 .divider{display:block;width:230px;max-width:60%;margin:38px auto 2px;opacity:.85}
+.spot{display:block;width:170px;max-width:55%;height:auto;margin:30px auto;opacity:.95}
 footer.site{border-top:1px solid var(--line);padding:30px 20px 40px;text-align:center;color:var(--faint);font-size:14px}
 @media(max-width:640px){h1{font-size:29px}.facts{grid-template-columns:1fr}}
 """
@@ -62,7 +63,7 @@ TEMPLATE = """<!DOCTYPE html>
 <div class="meta">{year}年製作</div>
 {hero}
 <h2>あらすじ・概要</h2>
-<p>{overview}</p>
+{overview}
 <div class="src">出典：<a href="{source_url}">{source_name}</a>（事実情報を整理して記載）</div>
 <h2>作品情報</h2>
 <dl class="facts">{facts}</dl>
@@ -94,6 +95,48 @@ def para(text):
     return "\n".join("<p>" + p.replace("\n", "<br>") + "</p>" for p in paras)
 
 
+def sentences(text):
+    parts = re.split(r"(?<=。)", text)
+    return [p for p in (x.strip() for x in parts) if p]
+
+
+def regroup(text, per=2, min_split=0):
+    """長い1段落を文単位で束ね直して段落に分ける（意味は変えない、改行だけ）"""
+    if not text:
+        return text
+    out = []
+    for block in text.split("\n\n"):
+        block = block.strip()
+        if not block:
+            continue
+        if len(block) <= min_split:
+            out.append(block)
+            continue
+        sents = sentences(block)
+        if len(sents) <= per:
+            out.append(block)
+            continue
+        for i in range(0, len(sents), per):
+            out.append("".join(sents[i:i + per]))
+    return "\n\n".join(out)
+
+
+def paras_html(text):
+    return para(text)
+
+
+def impression_html(no, text):
+    if not text:
+        return para(text)
+    blocks = [b.strip() for b in regroup(text, per=2, min_split=230).split("\n\n") if b.strip()]
+    html_blocks = []
+    spot = os.path.join(ROOT, "images", f"spot-{no}.svg")
+    for i, b in enumerate(blocks):
+        html_blocks.append(para(b))
+        if i == 2 and os.path.exists(spot) and len(blocks) >= 6:
+            html_blocks.append(f'<img class="spot" src="../images/spot-{no}.svg" alt="" loading="lazy">')
+    return "\n".join(html_blocks)
+
 def load_films():
     with open(os.path.join(ROOT, "data.js"), encoding="utf-8") as f:
         raw = f.read()
@@ -124,13 +167,13 @@ def build_all():
             year=film["year"],
             css=CSS,
             date=esc(d["date"] + " 公開") if d.get("date") else "REVIEW",
-            overview=esc(d.get("overview", "")),
+            overview=para(regroup(d.get("overview", ""), per=2, min_split=0)),
             source_name=esc(d["source"][0]) if d.get("source") else "",
             source_url=esc(d["source"][1]) if d.get("source") else "#",
             facts=facts,
-            impression=para(d.get("impression")),
+            impression=impression_html(no, d.get("impression")),
             analysis_block=("<h2>考察</h2>\n" + para(d.get("analysis"))) if (d.get("analysis") or "").strip() else "",
-            spoiler=para(d.get("spoiler_overview")),
+            spoiler=para(regroup(d.get("spoiler_overview"), per=2, min_split=0)),
         )
         with open(os.path.join(outdir, f"{no}.html"), "w", encoding="utf-8") as f:
             f.write(page)
