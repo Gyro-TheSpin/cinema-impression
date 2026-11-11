@@ -58,6 +58,7 @@ section.blk{margin-top:64px}
 @media(max-width:900px){.cards{grid-template-columns:1fr}}
 .card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:24px;cursor:pointer;transition:transform .25s,border-color .25s;display:flex;flex-direction:column;gap:10px}
 .card:hover{transform:translateY(-4px);border-color:var(--accent2)}
+.card .thumb{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
 .card .order{font-size:12px;letter-spacing:.22em;color:var(--accent);font-weight:900}
 .card h3{font-family:var(--serif);font-size:22px;font-weight:800;line-height:1.45}
 .card .meta{color:var(--muted);font-size:13px}
@@ -162,7 +163,8 @@ const byNo = {}; FILMS.forEach(f => byNo[f.no] = f);
 
 function cardHTML(f){
   const d = DRAFTS[f.no];
-  return `<div class="order">${d.date ? esc(d.date) + ' 公開' : 'NEW REVIEW'}</div>
+  return `<img class="thumb" src="images/${f.no}.svg" alt="" loading="lazy">
+    <div class="order">${d.date ? esc(d.date) + ' 公開' : 'NEW REVIEW'}</div>
     <h3>${esc(f.title)}</h3>
     <div class="meta">${f.year}年製作</div>
     <p class="ov">${esc(d.overview)}</p>

@@ -36,6 +36,9 @@ p{color:#d8d1bf;font-size:16px}
 .facts dd{color:var(--ink)}
 .empty{border:1px dashed var(--accent2);border-radius:12px;padding:16px 18px;color:var(--accent);font-size:14px;background:rgba(226,164,88,.05)}
 .warn{color:#d98c8c;font-size:13px;margin-bottom:10px}
+h2.spaced{margin-top:58px}
+.hero{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);margin:16px 0 4px;display:block}
+.divider{display:block;width:230px;max-width:60%;margin:38px auto 2px;opacity:.85}
 footer.site{border-top:1px solid var(--line);padding:30px 20px 40px;text-align:center;color:var(--faint);font-size:13px}
 @media(max-width:640px){h1{font-size:26px}.facts{grid-template-columns:1fr}}
 """
@@ -56,19 +59,21 @@ TEMPLATE = """<!DOCTYPE html>
 <div class="date">{date}</div>
 <h1>{title}</h1>
 <div class="meta">{year}年製作</div>
+{hero}
 <h2>あらすじ・概要</h2>
 <p>{overview}</p>
 <div class="src">出典：<a href="{source_url}">{source_name}</a>（事実情報を整理して記載）</div>
 <h2>作品情報</h2>
 <dl class="facts">{facts}</dl>
+<h2 class="spaced">ネタバレあり｜詳しいあらすじ</h2>
+<p class="warn">※ここから先は結末まで含むネタバレです。未見の方はご注意ください。</p>
+{spoiler}
+<div class="src">あらすじの出典：<a href="{source_url}">{source_name}</a>（事実情報を整理して記載）</div>
+<img class="divider" src="../images/divider.svg" alt="">
 <h2>感想</h2>
 {impression}
 <h2>考察</h2>
 {analysis}
-<h2>ネタバレあり｜詳しいあらすじ</h2>
-<p class="warn">※ここから先は結末まで含むネタバレです。未見の方はご注意ください。</p>
-{spoiler}
-<div class="src">あらすじの出典：<a href="{source_url}" target="_blank" rel="noopener">{source_name}</a>（事実情報を整理して記載）</div>
 </main>
 <footer class="site">シネマインプレッション<br>映画の感想と考察を、1日1本ずつ。</footer>
 </body>
@@ -107,7 +112,11 @@ def build_all():
         facts = "".join(
             f"<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>" for k, v in d.get("facts", [])
         )
+        hero = ""
+        if os.path.exists(os.path.join(ROOT, "images", f"{no}.svg")):
+            hero = f'<img class="hero" src="../images/{no}.svg" alt="{esc(film["title"])}のイラスト">'
         page = TEMPLATE.format(
+            hero=hero,
             title=esc(film["title"]),
             year=film["year"],
             css=CSS,
