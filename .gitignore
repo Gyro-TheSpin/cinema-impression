@@ -1,0 +1,4 @@
+# 声メモの原文と録音は公開しない
+impressions/audio/
+impressions/*.raw.txt
+__pycache__/

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シネマインプレッション｜映画の感想と考察</title>
+<meta name="description" content="映画の感想と考察を1日1本ずつ更新するレビューサイト。ネタバレなしの感想から、結末まで語る考察まで。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0c0a; --bg2:#14120e; --panel:#181510; --panel2:#1f1b14;
+  --ink:#ede7da; --muted:#a89d89; --faint:#6f6656;
+  --accent:#e2a458; --accent2:#c97e3d; --line:#2b261c;
+  --chip:#241e14; --ok:#9dbb7a;
+  --serif:"Shippori Mincho B1",serif; --sans:"Zen Kaku Gothic New",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+::selection{background:var(--accent);color:#191307}
+
+/* film strip edge */
+.strip{height:22px;background:
+  radial-gradient(circle at 11px 50%, #000 5px, transparent 6px) 0 0/34px 100% repeat-x,
+  linear-gradient(#1c1913,#1c1913);border-block:1px solid var(--line);opacity:.9}
+
+header.site{position:sticky;top:0;z-index:50;background:rgba(13,12,10,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hd{max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:18px}
+.brand{font-family:var(--serif);font-weight:800;font-size:20px;letter-spacing:.06em;color:var(--ink);white-space:nowrap}
+.brand b{color:var(--accent);font-weight:800}
+.hd nav{margin-left:auto;display:flex;gap:20px;font-size:13px;letter-spacing:.12em}
+.hd nav a{color:var(--muted)}
+.hd nav a:hover{color:var(--accent);text-decoration:none}
+@media(max-width:640px){.hd nav{display:none}}
+
+.hero{max-width:1120px;margin:0 auto;padding:72px 20px 54px;position:relative}
+.hero .kicker{font-size:12px;letter-spacing:.34em;color:var(--accent);font-weight:700;margin-bottom:18px}
+.hero h1{font-family:var(--serif);font-weight:800;font-size:clamp(38px,7vw,72px);line-height:1.25;letter-spacing:.02em}
+.hero h1 .num{color:var(--accent)}
+.hero p.lead{margin-top:22px;max-width:640px;color:var(--muted);font-size:16px}
+.stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:150px}
+.stat .v{font-family:var(--serif);font-size:30px;font-weight:800;line-height:1.1}
+.stat .v span{font-size:14px;color:var(--muted);font-family:var(--sans);font-weight:500}
+.stat .k{font-size:12px;color:var(--faint);letter-spacing:.14em;margin-top:4px}
+
+main{max-width:1120px;margin:0 auto;padding:0 20px 40px}
+section.blk{margin-top:64px}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.sec-head h2{font-family:var(--serif);font-size:26px;font-weight:800;letter-spacing:.04em}
+.sec-head .sub{color:var(--faint);font-size:13px}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.cards{grid-template-columns:1fr}}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:24px;cursor:pointer;transition:transform .25s,border-color .25s;display:flex;flex-direction:column;gap:10px}
+.card:hover{transform:translateY(-4px);border-color:var(--accent2)}
+.card .order{font-size:12px;letter-spacing:.22em;color:var(--accent);font-weight:900}
+.card h3{font-family:var(--serif);font-size:22px;font-weight:800;line-height:1.45}
+.card .meta{color:var(--muted);font-size:13px}
+.card .ov{color:#cfc7b4;font-size:14px;line-height:1.75}
+.card .foot{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;letter-spacing:.08em;background:var(--chip);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 10px}
+.tag.draft{color:#101408;background:var(--ok);border-color:var(--ok);font-weight:700}
+.tag.wait{color:var(--accent)}
+
+.tools{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.tools input[type=search]{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:12px 16px;font-size:15px;font-family:var(--sans)}
+.tools input[type=search]:focus{outline:2px solid var(--accent2);outline-offset:1px}
+.tools select{background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:12px;font-size:14px;font-family:var(--sans)}
+.count-note{color:var(--faint);font-size:13px;margin-bottom:10px}
+ul.queue{list-style:none;border-top:1px solid var(--line)}
+ul.queue li{display:flex;align-items:center;gap:16px;padding:13px 8px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+ul.queue li:hover{background:var(--panel)}
+.q-order{font-family:var(--serif);font-weight:800;color:var(--faint);width:52px;text-align:right;font-size:15px;flex:none}
+.q-main{flex:1;min-width:0}
+.q-title{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-sub{color:var(--faint);font-size:12px}
+.q-chip{flex:none}
+.more{display:block;margin:22px auto 0;background:none;border:1px solid var(--accent2);color:var(--accent);border-radius:999px;padding:11px 30px;font-size:14px;font-family:var(--sans);cursor:pointer;letter-spacing:.1em}
+.more:hover{background:var(--chip)}
+
+.about{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px}
+.about p{color:#cfc7b4;max-width:760px}
+.about p+p{margin-top:12px}
+.about b{color:var(--ink)}
+
+footer.site{border-top:1px solid var(--line);margin-top:80px;padding:34px 20px 46px;text-align:center;color:var(--faint);font-size:13px}
+footer.site .brand{font-size:17px}
+
+dialog{border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:20px;max-width:680px;width:calc(100% - 32px);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
+.dlg-in{padding:30px 30px 34px;max-height:82vh;overflow:auto}
+.dlg-in .order{font-size:12px;letter-spacing:.22em;color:var(--accent);font-weight:900}
+.dlg-in h3{font-family:var(--serif);font-size:28px;font-weight:800;line-height:1.4;margin:6px 0 2px}
+.dlg-in .meta{color:var(--muted);font-size:14px;margin-bottom:18px}
+.dlg-in h4{font-family:var(--serif);font-size:17px;margin:22px 0 8px;padding-left:10px;border-left:3px solid var(--accent)}
+.dlg-in p{color:#d8d1bf;font-size:15px}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:14px}
+.facts dt{color:var(--faint);font-size:12px;letter-spacing:.1em}
+.facts dd{font-weight:500}
+.empty{border:1px dashed var(--accent2);border-radius:12px;padding:16px 18px;color:var(--accent);font-size:14px;background:rgba(226,164,88,.05)}
+.src{font-size:12px;color:var(--faint);margin-top:8px}
+.dlg-close{position:sticky;top:0;float:right;background:var(--panel2);border:1px solid var(--line);color:var(--ink);width:38px;height:38px;border-radius:50%;font-size:17px;cursor:pointer}
+@media(max-width:640px){.facts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="strip" aria-hidden="true"></div>
+<header class="site">
+  <div class="hd">
+    <a class="brand" href="#top">シネマ<b>インプレッション</b></a>
+    <nav>
+      <a href="#next">新着レビュー</a>
+      <a href="#queue">レビュー一覧</a>
+      <a href="#about">このサイトについて</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="kicker">MOVIE REVIEWS &amp; NOTES</div>
+  <h1>映画の余韻を、<br><span class="num">言葉でもう一度</span>。</h1>
+  <p class="lead">映画を観終わったあと、誰かの感想や考察を読みたくなる——そんな気持ちに応えるレビューサイトです。ネタバレなしで読める感想から、結末までしっかり語る考察まで。更新は1日1本、ゆっくりと。</p>
+</div>
+
+<main>
+  <section class="blk" id="next">
+    <div class="sec-head"><h2>新着レビュー</h2><span class="sub">最近の記事</span></div>
+    <div class="cards" id="nextCards"></div>
+  </section>
+
+  <section class="blk" id="queue">
+    <div class="sec-head"><h2>レビュー一覧</h2><span class="sub">タイトル検索・年代で探せます ／ クリックで記事を開く</span></div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="タイトルで検索（例：コナン、キングスマン）" aria-label="タイトル検索">
+      <select id="decade" aria-label="年代で絞り込み">
+        <option value="">すべての年代</option>
+      </select>
+    </div>
+    <div class="count-note" id="countNote"></div>
+    <ul class="queue" id="queueList"></ul>
+    <button class="more" id="moreBtn" type="button">もっと見る</button>
+  </section>
+
+  <section class="blk" id="about">
+    <div class="sec-head"><h2>このサイトについて</h2></div>
+    <div class="about">
+      <p><b>書いている人。</b>映画が好きで、年間100本以上を劇場と配信で観ています。このサイトでは、観た作品の感想と考察を、備忘録も兼ねて1日1本ずつ書いています。</p>
+      <p><b>更新。</b>新しい記事は1日1本ずつ追加しています。気になる作品は、タイトル検索や年代フィルターから探してみてください。</p>
+      <p><b>ネタバレについて。</b>感想は原則ネタバレなしで書いています。考察では結末に触れることもあるので、その場合は記事の冒頭でお知らせします。</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="brand">シネマ<b>インプレッション</b></div>
+  <p style="margin-top:8px">映画の感想と考察を、1日1本ずつ。作品情報の出典は各記事に明記しています。</p>
+</footer>
+
+<dialog id="dlg">
+  <div class="dlg-in">
+    <button class="dlg-close" id="dlgClose" type="button" aria-label="閉じる">×</button>
+    <div id="dlgBody"></div>
+  </div>
+</dialog>
+
+<script src="data.js"></script>
+<script src="drafts.js"></script>
+<script>
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const byNo = {}; FILMS.forEach(f => byNo[f.no] = f);
+
+function cardHTML(f){
+  const d = DRAFTS[f.no];
+  return `<div class="order">${d.date ? esc(d.date) + ' 公開' : 'NEW REVIEW'}</div>
+    <h3>${esc(f.title)}</h3>
+    <div class="meta">${f.year}年製作</div>
+    <p class="ov">${esc(d.overview)}</p>
+    <div class="foot">${d.published ? '<span class="tag draft">公開中</span>' : d.impression ? '<span class="tag draft">レビュー</span>' : '<span class="tag draft">レビュー</span><span class="tag wait">感想は準備中</span>'}</div>`;
+}
+const nextWrap = $("#nextCards");
+FILMS.slice(0,3).forEach(f => {
+  const el = document.createElement("article");
+  el.className = "card"; el.innerHTML = cardHTML(f);
+  el.addEventListener("click", () => openFilm(f.no));
+  nextWrap.appendChild(el);
+});
+
+// decade select
+const decades = [...new Set(FILMS.map(f => Math.floor(f.year/10)*10))].sort((a,b)=>b-a);
+const sel = $("#decade");
+decades.forEach(d => { const o=document.createElement("option"); o.value=d; o.textContent = d+"年代"; sel.appendChild(o); });
+
+let shown = 60;
+function filtered(){
+  const q = $("#q").value.trim();
+  const dc = sel.value;
+  return FILMS.filter(f => (!q || f.title.includes(q)) && (!dc || Math.floor(f.year/10)*10 === Number(dc)));
+}
+function renderQueue(){
+  const list = filtered();
+  const ul = $("#queueList"); ul.innerHTML = "";
+  list.slice(0, shown).forEach(f => {
+    const li = document.createElement("li");
+    const dd = DRAFTS[f.no];
+    const chip = dd && dd.published ? '<span class="tag draft q-chip">公開中</span>' : dd ? '<span class="tag draft q-chip">レビューあり</span>' : '<span class="tag q-chip">準備中</span>';
+    li.innerHTML = `
+      <span class="q-main"><span class="q-title">${esc(f.title)}</span><br><span class="q-sub">${f.year}年製作</span></span>${chip}`;
+    li.addEventListener("click", () => openFilm(f.no));
+    ul.appendChild(li);
+  });
+  $("#countNote").textContent = `${list.length}作品中 ${Math.min(shown, list.length)}作品を表示`;
+  $("#moreBtn").style.display = list.length > shown ? "" : "none";
+}
+$("#moreBtn").addEventListener("click", () => { shown += 60; renderQueue(); });
+$("#q").addEventListener("input", () => { shown = 60; renderQueue(); });
+sel.addEventListener("change", () => { shown = 60; renderQueue(); });
+renderQueue();
+
+const dlg = $("#dlg");
+function openFilm(no){
+  const f = byNo[no]; const d = DRAFTS[no];
+  let h = `<div class="order">${d && d.date ? esc(d.date) + ' 公開' : 'REVIEW'}</div><h3>${esc(f.title)}</h3><div class="meta">${f.year}年製作</div>`;
+  if (d){
+    h += `<h4>あらすじ・概要</h4><p>${esc(d.overview)}</p>
+      <div class="src">出典：<a href="${d.source[1]}" target="_blank" rel="noopener">${esc(d.source[0])}</a>（事実情報を整理して記載）</div>
+      <h4>作品情報</h4><dl class="facts">${d.facts.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`;
+  } else {
+    h += `<h4>あらすじ・概要</h4><div class="empty">この作品の記事は準備中です。</div>`;
+  }
+  h += (d && d.impression)
+    ? `<h4>感想</h4><p>${esc(d.impression).replace(/\n/g, '<br>')}</p>`
+    : `<h4>感想</h4><div class="empty">感想は準備中です。</div>`;
+  h += (d && d.analysis)
+    ? `<h4>考察</h4><p>${esc(d.analysis).replace(/\n/g, '<br>')}</p>`
+    : `<h4>考察</h4><div class="empty">考察は準備中です。</div>`;
+  $("#dlgBody").innerHTML = h;
+  dlg.showModal();
+}
+$("#dlgClose").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+</script>
+</body>
+</html>
