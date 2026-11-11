@@ -195,6 +195,16 @@ def first_sentences(text, limit=350):
 
 def main():
     dry_run = "--dry-run" in sys.argv
+    # 週1回（月曜 JST）だけ Filmarks と差分同期する。失敗しても下書き作成は続ける。
+    try:
+        import datetime as _dt
+        import subprocess as _sp
+        _jst = _dt.timezone(_dt.timedelta(hours=9))
+        if _dt.datetime.now(_jst).weekday() == 0 or os.environ.get("SYNC_FILMARKS"):
+            _sp.run([sys.executable, os.path.join(ROOT, "tools", "sync_filmarks.py")],
+                    timeout=900, check=False)
+    except Exception as _e:
+        print(f"[next_draft] Filmarks同期をスキップ: {_e}")
     queue_path = find_queue()
     drafts_path = os.path.join(ROOT, "drafts.json")
 
