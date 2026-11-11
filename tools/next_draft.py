@@ -100,16 +100,22 @@ def wiki_plot(title):
         return None
     text = next(iter(pages.values())).get("extract") or ""
     lines = [ln.strip() for ln in text.splitlines()]
+
+    def heading(ln):
+        # Wikipediaのexplaintextは見出しを "== ストーリー ==" の形で返すため
+        # "=" と空白を除いて見出し名だけを取り出す
+        return ln.strip("= ").strip()
+
     start = None
     for i, ln in enumerate(lines):
-        if ln in ("あらすじ", "ストーリー", "物語", "プロット"):
+        if heading(ln) in ("あらすじ", "ストーリー", "物語", "プロット"):
             start = i + 1
             break
     if start is None:
         return None
     body = []
     for ln in lines[start:]:
-        if ln in NEXT_HEADINGS:
+        if heading(ln) in NEXT_HEADINGS:
             break
         if ln:
             body.append(ln)
