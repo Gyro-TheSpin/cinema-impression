@@ -3,7 +3,7 @@
 
 設計（合意済み）:
 - 投稿ペースは1日1本。大量生成はAdSense/検索の量産判定リスクがあるため、
-  このスクリプトは1回の実行で BATCH 本（既定1）しか処理しない。
+  このスクリプトは1回の実行で BATCH 本（既定3）しか処理しない。
 - 対象は queue CSV のうち status=pending で queue_no が最大のもの（＝キューの下）。
 - 概要は Wikipedia API のリード文（extract）を取得し、
   GEMINI_API_KEY があれば Gemini で「事実を変えずに短くまとめた概要」に整形、
@@ -24,12 +24,15 @@
 import csv
 import json
 import os
+import re
 import sys
 import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BATCH = int(os.environ.get("BATCH", "1"))
+# 1回の実行で作る下書きの本数。2026-11-12 にユーザーの指示で 1日3本へ変更。
+# ワークフロー側の旧 BATCH 環境変数は廃止（DAILY_BATCH で上書き可）。
+BATCH = int(os.environ.get("DAILY_BATCH", "3"))
 
 
 def find_queue():
@@ -69,6 +72,60 @@ def wiki_summary(title, year):
     page = next(iter(pages.values()))
     extract = (page.get("extract") or "").strip()
     return {"extract": extract, "url": page.get("fullurl", ""), "page_title": page.get("title", "")}
+
+
+def _clean_wiki_value(v):
+    v = re.sub(r"\{\{[^{}]*\}\}", "", v)  # テンプレート除去
+    v = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", v)  # [[a|b]]→b, [[a]]→a
+    v = re.sub(r"<[^>]+>", "\n", v)  # <br> 等は区切りに
+    v = re.sub(r"'{2,3}", "", v)
+    parts = [p.strip(" *　") for p in v.split("\n")]
+    parts = [p for p in parts if p]
+    return parts
+
+
+def wiki_facts(page_title):
+    """Wikipedia の Infobox から作品情報（監督・出演など）を抽出する。失敗したら空リスト。"""
+    api = "https://ja.wikipedia.org/w/api.php"
+    params = {"action": "parse", "page": page_title, "prop": "wikitext", "format": "json", "redirects": "1"}
+    req = urllib.request.Request(
+        api + "?" + urllib.parse.urlencode(params),
+        headers={"User-Agent": "movie-blog-draft/1.0 (personal project)"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.load(r)
+        wikitext = ((data.get("parse") or {}).get("wikitext") or {}).get("*", "")
+    except Exception:
+        return []
+    fields = {}
+    for m in re.finditer(r"^\|\s*([^=|]+?)\s*=\s*(.+)$", wikitext, re.M):
+        fields[m.group(1).strip()] = m.group(2).strip()
+    facts = []
+    def add(label, keys, limit=None, joiner="、"):
+        for k in keys:
+            if k in fields:
+                parts = _clean_wiki_value(fields[k])
+                if limit:
+                    parts = parts[:limit]
+                if parts:
+                    facts.append([label, joiner.join(parts)])
+                return
+    add("監督", ["監督"])
+    add("脚本", ["脚本"])
+    add("原作", ["原作"])
+    add("出演", ["出演者", "出演"], limit=6)
+    add("音楽", ["音楽"])
+    if "公開" in fields:
+        m = re.search(r"(\d{4})年(\d{1,2})月(\d{1,2})日", fields["公開"])
+        if m:
+            facts.append(["公開", f"{m.group(1)}年{int(m.group(2))}月{int(m.group(3))}日"])
+    if "上映時間" in fields:
+        m = re.search(r"(\d+)\s*分", fields["上映時間"])
+        if m:
+            facts.append(["上映時間", f"{m.group(1)}分"])
+    add("製作国", ["製作国"])
+    return facts
 
 
 NEXT_HEADINGS = ["登場人物", "キャスト", "声の出演", "スタッフ", "制作", "製作", "公開", "評価", "興行成績", "脚注", "出典", "関連項目", "外部リンク", "主題歌", "音楽"]
@@ -242,7 +299,7 @@ def main():
         )
         draft = {
             "overview": overview,
-            "facts": [["製作年", f"{t['year']}年"]],
+            "facts": [["製作年", f"{t['year']}年"]] + wiki_facts(info["page_title"]),
             "source": [f"Wikipedia「{info['page_title']}」", info["url"]],
         }
         plot = wiki_plot(t["title"])
