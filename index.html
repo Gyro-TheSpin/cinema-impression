@@ -80,6 +80,11 @@ header.site nav .en{display:block;font-size:10px;letter-spacing:.22em;color:var(
 .kv .pick .go{font-size:13px;font-weight:900;color:var(--green-d);margin-top:4px}
 .kv .pick .seat{font-size:11.5px;color:var(--muted);letter-spacing:.1em}
 
+
+.kv-photo{display:block;width:100%;aspect-ratio:12/5;min-height:300px;object-fit:cover}
+.kv-shade{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(transparent,rgba(10,12,24,.5));pointer-events:none}
+.kv-credit{position:absolute;right:14px;bottom:10px;font-size:11px;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6)}
+
 /* theater sign */
 .sign{margin-top:30px;background:var(--night);border-radius:20px;padding:10px;position:relative}
 .sign .inner{border:2px solid rgba(255,207,63,.55);border-radius:13px;padding:clamp(20px,3.6vw,36px);display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end}
@@ -181,68 +186,7 @@ footer.site .fm a{text-decoration:underline}
   </header>
 
   <div class="kv" id="top">
-    <svg viewBox="0 0 960 400" role="img" aria-label="夜の野外シネマのイラスト">
-      <rect width="960" height="400" fill="#1d2440"/>
-      <g fill="#fff8e6">
-        <circle class="star" cx="90" cy="52" r="3"/><circle class="star s2" cx="210" cy="30" r="2.4"/><circle class="star s3" cx="330" cy="64" r="2.8"/><circle class="star s2" cx="470" cy="26" r="2.2"/><circle class="star" cx="590" cy="56" r="2.6"/><circle class="star s3" cx="700" cy="30" r="2.3"/><circle class="star s2" cx="905" cy="120" r="2.6"/><circle class="star" cx="60" cy="130" r="2.3"/><circle class="star s3" cx="880" cy="36" r="2.8"/>
-      </g>
-      <path d="M838 44 a30 30 0 1 0 18 54 a24 24 0 1 1 -18 -54" fill="#ffdf7e"/>
-      <path d="M30 168 Q 240 128 470 156 T 930 140" stroke="#ffdf7e" stroke-width="2.4" fill="none"/>
-      <g>
-        <circle class="bulb" cx="120" cy="158" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="215" cy="146" r="6" fill="#ffdf7e"/><circle class="bulb" cx="312" cy="148" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="408" cy="154" r="6" fill="#ffdf7e"/><circle class="bulb" cx="505" cy="156" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="602" cy="152" r="6" fill="#ffdf7e"/><circle class="bulb" cx="700" cy="146" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="798" cy="142" r="6" fill="#ffdf7e"/><circle class="bulb" cx="888" cy="140" r="6" fill="#ffdf7e"/>
-      </g>
-      <path d="M0 306 Q 240 226 480 278 T 960 258 V400 H0Z" fill="#2e4a34"/>
-      <path d="M0 346 Q 300 292 620 330 T 960 318 V400 H0Z" fill="#223825"/>
-      <clipPath id="scrClip"><rect x="330" y="88" width="270" height="164"/></clipPath>
-      <g clip-path="url(#scrClip)">
-        <rect x="330" y="88" width="270" height="164" fill="#fdf6dd"/>
-        <g class="scene s1">
-          <rect x="330" y="88" width="270" height="164" fill="#fffbee"/>
-          <g class="scr-cloud" fill="#ffffff" opacity="0.9"><ellipse cx="404" cy="120" rx="27" ry="9"/><ellipse cx="428" cy="112" rx="18" ry="7"/><ellipse cx="528" cy="104" rx="21" ry="7"/></g>
-          <polygon points="382,232 465,116 548,232" fill="#f59a3c"/>
-          <circle class="scr-sun" cx="465" cy="152" r="16" fill="#ffcf3f" stroke="#2b2b26" stroke-width="3"/>
-          <path d="M428 204 q37 -30 74 0" fill="none" stroke="#2b2b26" stroke-width="3.4" stroke-linecap="round"/>
-        </g>
-        <g class="scene s2">
-          <rect x="330" y="88" width="270" height="164" fill="#31456e"/>
-          <g fill="#ffffff" opacity="0.85"><circle cx="368" cy="112" r="2"/><circle cx="420" cy="98" r="1.7"/><circle cx="560" cy="150" r="1.8"/><circle cx="386" cy="150" r="1.6"/></g>
-          <circle cx="522" cy="126" r="17" fill="#ffdf7e"/>
-          <circle cx="531" cy="120" r="15" fill="#31456e"/>
-          <g><polygon points="428,178 442,178 436,166" fill="#fffdf4"/><line x1="435" y1="166" x2="435" y2="182" stroke="#0e0e16" stroke-width="2.4"/><path d="M414 184 h44 l-7 9 h-30z" fill="#0e0e16"/></g>
-          <path class="waveA" d="M336 210 q14 -8 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0" fill="none" stroke="#aedce8" stroke-width="3" stroke-linecap="round"/>
-          <path class="waveB" d="M336 230 q14 -8 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0" fill="none" stroke="#7fb8cc" stroke-width="3" stroke-linecap="round"/>
-        </g>
-        <g class="scene s3">
-          <rect x="330" y="88" width="270" height="164" fill="#f9a95e"/>
-          <circle cx="465" cy="200" r="32" fill="#e2572b"/>
-          <g class="birds" stroke="#5b3a29" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M492 118 q6 -6 12 0 q6 -6 12 0"/><path d="M528 140 q5 -5 10 0 q5 -5 10 0"/></g>
-          <path d="M330 252 V216 Q 430 202 600 222 V252Z" fill="#5b3a29"/>
-          <g><rect x="382" y="168" width="7" height="42" fill="#4a2e20"/><circle cx="385" cy="152" r="21" fill="#4a2e20"/><circle cx="366" cy="164" r="13" fill="#4a2e20"/><circle cx="404" cy="164" r="13" fill="#4a2e20"/></g>
-        </g>
-        <rect class="scr-shine" x="330" y="70" width="44" height="200" fill="#ffffff" opacity="0.16"/>
-        <path d="M330 88 h34 v164 h-34z M566 88 h34 v164 h-34z" fill="#a02323"/>
-      </g>
-      <rect x="330" y="88" width="270" height="164" rx="8" fill="none" stroke="#0e0e16" stroke-width="4"/>
-      <g>
-        <polygon class="beam" points="676,246 604,252 604,300 676,306" fill="#ffe9a8"/>
-        <g class="reelspin"><circle cx="674" cy="226" r="10" fill="#262f52" stroke="#0e0e16" stroke-width="3"/><circle cx="674" cy="226" r="2.6" fill="#0e0e16"/><circle cx="674" cy="219.5" r="2" fill="#0e0e16"/><circle cx="674" cy="232.5" r="2" fill="#0e0e16"/></g>
-        <g class="reelspin"><circle cx="693" cy="222" r="7.5" fill="#262f52" stroke="#0e0e16" stroke-width="3"/><circle cx="693" cy="222" r="2" fill="#0e0e16"/><circle cx="693" cy="217" r="1.6" fill="#0e0e16"/><circle cx="693" cy="227" r="1.6" fill="#0e0e16"/></g>
-        <rect x="668" y="238" width="30" height="44" rx="5" fill="#0e0e16"/>
-        <circle cx="683" cy="252" r="6" fill="#ffdf7e"/>
-      </g>
-      <g>
-        <rect x="140" y="302" width="180" height="50" rx="6" fill="#fff" stroke="#0e0e16" stroke-width="3"/>
-        <path d="M140 315 h180 M140 328 h180 M140 341 h180 M155 302 v50 M170 302 v50 M185 302 v50 M200 302 v50 M215 302 v50 M230 302 v50 M245 302 v50 M260 302 v50 M275 302 v50 M290 302 v50 M305 302 v50" stroke="#c22f2f" stroke-width="2" opacity="0.5"/>
-        <circle cx="200" cy="290" r="12" fill="#0e0e16"/><path d="M188 326 q12 -24 24 0 v26 h-24z" fill="#0e0e16"/>
-        <circle cx="256" cy="286" r="12" fill="#0e0e16"/><path d="M244 322 q12 -24 24 0 v30 h-24z" fill="#c22f2f"/>
-        <circle cx="716" cy="322" r="11" fill="#0e0e16"/><path d="M705 354 q11 -22 22 0 v18 h-22z" fill="#0e0e16"/>
-      </g>
-      <g fill="#ffe98a">
-        <circle class="firefly" cx="248" cy="330" r="2.8"/>
-        <circle class="firefly f2" cx="566" cy="356" r="2.4"/>
-        <circle class="firefly f3" cx="792" cy="306" r="2.6"/>
-      </g>
-    </svg>
+    <img class="kv-photo" src="https://images.pexels.com/photos/2507025/pexels-photo-2507025.jpeg?auto=compress&w=1260&h=750&dpr=1" alt="海辺の野外シネマの写真"><div class="kv-shade"></div><div class="kv-credit">写真：Quark Studio / Pexels（フリー素材）</div>
     <a class="pick rv" id="pickCard" href="articles/571.html" style="--d:.35s">
       <span class="flag">今週の1本！！</span>
       <div class="t" id="pickTitle"><span class="nobr">「ルックバック」——</span><br><span class="nobr">こんなに揺さぶられるなんて</span></div>

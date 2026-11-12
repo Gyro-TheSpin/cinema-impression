@@ -45,6 +45,8 @@ header.site nav .en{display:block;font-size:10px;letter-spacing:.22em;color:var(
 .a-kv::before,.a-kv::after{content:"";position:absolute;top:0;bottom:0;width:34px;z-index:2;background:radial-gradient(circle at -6px 12px,transparent 13px,var(--curtain) 13.5px);background-size:34px 30px;background-repeat:repeat-y}
 .a-kv::before{left:0}.a-kv::after{right:0;transform:scaleX(-1)}
 .a-kv img{width:100%;height:auto;display:block}
+.a-kv iframe{width:100%;aspect-ratio:16/9;display:block;border:0;background:#000}
+.trailer-note{font-size:11.5px;color:var(--muted);text-align:right;margin-top:6px}
 article.body h2{font-family:var(--round);font-weight:800;font-size:22px;margin:42px 0 12px;display:flex;align-items:center;gap:11px}
 article.body h2 .ic{width:26px;height:26px;flex:none}
 article.body p{font-size:16.5px;line-height:1.95;color:#33322b;margin-bottom:14px}
@@ -267,7 +269,15 @@ def build_all():
             if k == "上映時間":
                 runtime = f" ・ {esc(v)}"
         hero = ""
-        if os.path.exists(os.path.join(ROOT, "images", f"{no}.svg")):
+        trailer = (d.get("trailer") or "").strip()
+        if re.fullmatch(r"[A-Za-z0-9_-]{6,20}", trailer):
+            hero = (
+                f'<figure class="a-kv rv"><iframe src="https://www.youtube-nocookie.com/embed/{esc(trailer)}" '
+                f'title="{esc(film["title"])} 公式予告編" loading="lazy" '
+                'allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></figure>'
+                '<div class="trailer-note">公式予告編（YouTube）</div>'
+            )
+        elif os.path.exists(os.path.join(ROOT, "images", f"{no}.svg")):
             hero = f'<figure class="a-kv rv"><img src="../images/{no}.svg" alt="{esc(film["title"])}のイラスト"></figure>'
         date = esc(d["date"].replace("-", ".") + " 掲載") if d.get("date") else "感想ジャーナル"
         # CSS/JS の波括弧と衝突しないよう、format ではなくトークン置換で埋め込む
