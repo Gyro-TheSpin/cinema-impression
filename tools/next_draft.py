@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""1日1本だけ、キューの下から次の映画の「概要・作品情報」下書きを作る。
+"""1日3本、キューの下から次の映画の「概要・作品情報」下書きを作る。
 
 設計（合意済み）:
-- 投稿ペースは1日1本。大量生成はAdSense/検索の量産判定リスクがあるため、
+- 投稿ペースは1日3本。大量生成はAdSense/検索の量産判定リスクがあるため、
   このスクリプトは1回の実行で BATCH 本（既定3）しか処理しない。
 - 対象は queue CSV のうち status=pending で queue_no が最大のもの（＝キューの下）。
 - 概要は Wikipedia API のリード文（extract）を取得し、
@@ -13,9 +13,9 @@
   サイト表示用の drafts.js を再生成する。
 
 使い方:
-  python3 tools/next_draft.py             # 次の1本を処理
+  python3 tools/next_draft.py             # 次の3本を処理
   python3 tools/next_draft.py --dry-run   # 次の対象を表示するだけ（取得・書き込みなし）
-  BATCH=1 python3 tools/next_draft.py     # 1回の処理本数（既定1、増やすのは非推奨）
+  DAILY_BATCH=1 python3 tools/next_draft.py  # 1回の処理本数（既定3）
 
 ファイル配置（リポジトリ化したときの想定）:
   data/queue.csv   … キュー（なければ ../filmarks-queue/filmarks_watched_queue.csv を探す）
@@ -122,6 +122,29 @@ def _page_by_title(title, intro_only=True):
     return None
 
 
+def _section_lines(text, section):
+    """「== {section} ==」から次の同レベル（== ==）見出しまでを行リストで返す。
+
+    漫画・ドラマ・映画が1記事にまとまっている同名作品（例：『ミステリと言う勿れ』）
+    で、映画だけの内容を取り出すためのもの。なければ None。
+    """
+    lines = [ln.strip() for ln in (text or "").splitlines()]
+    start = None
+    for i, ln in enumerate(lines):
+        if ln.startswith("== ") and not ln.startswith("=== "):
+            if ln.strip("= ").strip() == section:
+                start = i + 1
+                break
+    if start is None:
+        return None
+    out = []
+    for ln in lines[start:]:
+        if ln.startswith("== ") and not ln.startswith("=== "):
+            break
+        out.append(ln)
+    return out
+
+
 def wiki_summary(title, year):
     """日本語版 Wikipedia で作品ページを探し、リード文とURLと基本情報を返す。"""
     page = _page_by_title(title, intro_only=True)
@@ -131,6 +154,27 @@ def wiki_summary(title, year):
             return None
         page = _pick_page(pages, year, title)
     extract = (page.get("extract") or "").strip()
+    # 同名の漫画・ドラマ記事が先に立つ場合、リード文は漫画の説明になる
+    # （例：『ミステリと言う勿れ』は「田村由美による日本の漫画作品」）。
+    # その場合は記事内の「映画」セクションの冒頭文に差し替える。
+    if any(k in extract[:200] for k in ("漫画作品", "テレビドラマ", "テレビアニメ")):
+        full = _page_by_title(title, intro_only=False)
+        if full is not None:
+            sec = _section_lines(full.get("extract") or "", "映画")
+            if sec:
+                # 映画セクションの冒頭段落だけを使う。「### あらすじ」以降は
+                # ネタバレ本文なので概要には混ぜない。
+                head = []
+                for ln in sec:
+                    if ln.startswith("==="):
+                        break
+                    head.append(ln)
+                lead = " ".join(
+                    ln for ln in head
+                    if ln and not ln.startswith("=") and not ln.startswith("|")
+                ).strip()
+                if lead:
+                    extract = lead
     return {"extract": extract, "url": page.get("fullurl", ""), "page_title": page.get("title", "")}
 
 
@@ -207,6 +251,12 @@ NEXT_HEADINGS = ["登場人物", "キャスト", "声の出演", "スタッフ",
 
 def wiki_plot(title, year=None):
     """Wikipedia全文から「あらすじ」セクション（結末まで含む）を切り出す。見つからなければ None。"""
+
+    def heading(ln):
+        # Wikipediaのexplaintextは見出しを "== ストーリー ==" の形で返すため
+        # "=" と空白を除いて見出し名だけを取り出す
+        return ln.strip("= ").strip()
+
     page = _page_by_title(title, intro_only=False)
     if page is None:
         try:
@@ -217,28 +267,29 @@ def wiki_plot(title, year=None):
             return None
         page = _pick_page(pages, year, title) if year else pages[0]
     text = page.get("extract") or ""
-    lines = [ln.strip() for ln in text.splitlines()]
-
-    def heading(ln):
-        # Wikipediaのexplaintextは見出しを "== ストーリー ==" の形で返すため
-        # "=" と空白を除いて見出し名だけを取り出す
-        return ln.strip("= ").strip()
-
-    start = None
-    for i, ln in enumerate(lines):
-        if heading(ln) in ("あらすじ", "ストーリー", "物語", "プロット"):
-            start = i + 1
-            break
-    if start is None:
-        return None
-    body = []
-    for ln in lines[start:]:
-        if heading(ln) in NEXT_HEADINGS:
-            break
-        if ln:
-            body.append(ln)
-    plot = "".join(body).strip()
-    return plot[:4000] if len(plot) >= 80 else None
+    # 映画セクションがある記事（漫画・ドラマと同名）は、その中の「あらすじ」を使う。
+    # 全文の先頭から探すと漫画の「あらすじ」（全話分）を拾ってしまうため。
+    # セクション内にあらすじが無ければ全文から探す従来動作にフォールバックする。
+    sec_lines = _section_lines(text, "映画")
+    for lines in ([sec_lines] if sec_lines else []) + [[ln.strip() for ln in text.splitlines()]]:
+        lines = [ln for ln in lines if ln is not None]
+        start = None
+        for i, ln in enumerate(lines):
+            if heading(ln) in ("あらすじ", "ストーリー", "物語", "プロット"):
+                start = i + 1
+                break
+        if start is None:
+            continue
+        body = []
+        for ln in lines[start:]:
+            if heading(ln) in NEXT_HEADINGS:
+                break
+            if ln:
+                body.append(ln)
+        plot = "".join(body).strip()
+        if len(plot) >= 80:
+            return plot[:4000]
+    return None
 
 
 def summarize_spoiler_with_gemini(title, plot):
