@@ -74,6 +74,10 @@ def main():
     entry["impression"] = sections["感想"]
     if sections.get("考察"):
         entry["analysis"] = sections["考察"]
+    intro_path = os.path.join(ROOT, "impressions", f"{args.no}.intro.json")
+    if os.path.exists(intro_path):
+        with open(intro_path, encoding="utf-8") as f:
+            entry["intro"] = json.load(f)
     with open(drafts_path, "w", encoding="utf-8") as f:
         json.dump(drafts, f, ensure_ascii=False, indent=2)
     emit_js(drafts)

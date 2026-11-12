@@ -10,129 +10,281 @@
 <meta property="og:title" content="山田太郎シネマ｜映画の感想と考察">
 <meta property="og:description" content="映画の感想と考察を1日1本ずつ更新するレビューサイト。感想と考察は結末までしっかり語ります。">
 <meta property="og:url" content="https://gyro-thespin.github.io/cinema-impression/">
+<script>document.documentElement.className += ' js';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0d0c0a; --bg2:#14120e; --panel:#181510; --panel2:#1f1b14;
-  --ink:#ede7da; --muted:#a89d89; --faint:#6f6656;
-  --accent:#e2a458; --accent2:#c97e3d; --line:#2b261c;
-  --chip:#241e14; --ok:#9dbb7a;
-  --serif:"Shippori Mincho B1",serif; --sans:"Zen Kaku Gothic New",sans-serif;
+  --paper:#fffdf4; --cream:#fff8e6; --ink:#2b2b26; --muted:#7a7563;
+  --yellow:#ffcf3f; --green:#58a05c; --green-d:#3d7a44; --red:#c22f2f; --curtain:#a02323;
+  --night:#1d2440; --orange:#f59a3c;
+  --round:"M PLUS Rounded 1c",sans-serif; --sans:"Zen Kaku Gothic New",sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-::selection{background:var(--accent);color:#191307}
+body{background:#23263a;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+a{color:var(--ink);text-decoration:none}
+a:hover{opacity:.8}
+.fname,.nobr{white-space:nowrap}
+.sheet{max-width:1120px;margin:0 auto;background:var(--paper);padding:0 clamp(20px,5vw,64px) 60px;box-shadow:0 4px 24px rgba(0,0,0,.45);min-height:100vh}
+.js .rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;transition-delay:var(--d,0s)}
+.js .rv.in{opacity:1;transform:none}
 
-/* film strip edge */
-.strip{height:22px;background:
-  radial-gradient(circle at 11px 50%, #000 5px, transparent 6px) 0 0/34px 100% repeat-x,
-  linear-gradient(#1c1913,#1c1913);border-block:1px solid var(--line);opacity:.9}
+/* header */
+header.site{display:flex;align-items:center;gap:14px;padding:20px 0 14px}
+.logo{font-family:var(--round);font-weight:800;font-size:24px;display:flex;align-items:center;gap:10px}
+.logo .reel{width:34px;height:34px;flex:none;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+header.site nav{margin-left:auto;display:flex;gap:20px;font-family:var(--round);font-weight:700;font-size:14px}
+header.site nav .en{display:block;font-size:10px;letter-spacing:.22em;color:var(--muted);text-align:center}
+@media(max-width:700px){header.site nav a:not(:last-child){display:none}}
 
-header.site{position:sticky;top:0;z-index:50;background:rgba(13,12,10,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.hd{max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:18px}
-.brand{font-family:var(--serif);font-weight:800;font-size:22px;letter-spacing:.06em;color:var(--ink);white-space:nowrap}
-.brand b{color:var(--accent);font-weight:800}
-.hd nav{margin-left:auto;display:flex;gap:20px;font-size:15px;letter-spacing:.12em}
-.hd nav a{color:var(--muted)}
-.hd nav a:hover{color:var(--accent);text-decoration:none}
-@media(max-width:640px){.hd nav{display:none}}
+/* KV */
+.kv{position:relative;border-radius:28px;overflow:hidden;background:var(--night);border:2.5px solid var(--ink)}
+.kv svg{display:block;width:100%;height:auto}
+.kv .star{animation:twinkle 2.8s ease-in-out infinite}
+.kv .star.s2{animation-delay:.9s}.kv .star.s3{animation-delay:1.7s}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+.kv .beam{animation:flicker 3.6s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:.55}48%{opacity:.68}52%{opacity:.6}76%{opacity:.7}}
+.kv .bulb{animation:bulb 1.6s ease-in-out infinite}
+.kv .bulb.b2{animation-delay:.8s}
+@keyframes bulb{0%,100%{fill:#ffdf7e}50%{fill:#fff3c4}}
+.kv .scr-sun{animation:sunBob 5s ease-in-out infinite;transform-box:fill-box}
+@keyframes sunBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.kv .scr-cloud{animation:cloudDrift 9s ease-in-out infinite alternate;transform-box:fill-box}
+@keyframes cloudDrift{from{transform:translateX(-4px)}to{transform:translateX(14px)}}
+.kv .scr-shine{animation:shineMove 7s ease-in-out infinite}
+@keyframes shineMove{0%,55%{transform:translateX(-70px) skewX(-14deg)}88%,100%{transform:translateX(330px) skewX(-14deg)}}
+.kv .reelspin{animation:spin 6s linear infinite;transform-box:fill-box;transform-origin:center}
+.kv .scene{opacity:0;animation:sceneCycle 15s linear infinite}
+.kv .scene.s1{animation-delay:0s}
+.kv .scene.s2{animation-delay:5s}
+.kv .scene.s3{animation-delay:10s}
+@keyframes sceneCycle{0%{opacity:0}2.5%{opacity:1}30.5%{opacity:1}33.4%{opacity:0}100%{opacity:0}}
+.kv .waveA{animation:waveMove 3.4s ease-in-out infinite alternate}
+.kv .waveB{animation:waveMove 4.2s ease-in-out infinite alternate-reverse}
+@keyframes waveMove{from{transform:translateX(-5px)}to{transform:translateX(5px)}}
+.kv .birds{animation:cloudDrift 8s ease-in-out infinite alternate;transform-box:fill-box}
+.kv .firefly{animation:fly 8s ease-in-out infinite}
+.kv .firefly.f2{animation-delay:1.6s}.kv .firefly.f3{animation-delay:3.1s}
+@keyframes fly{0%,100%{transform:translate(0,0);opacity:.95}33%{transform:translate(10px,-12px);opacity:.35}66%{transform:translate(-8px,-6px);opacity:.8}}
+.kv .pick{position:absolute;left:clamp(16px,3.5vw,40px);bottom:clamp(16px,3.5vw,36px);background:#fffdf4;border:2.5px solid var(--ink);border-radius:6px 18px 18px 6px;padding:14px 20px 13px 30px;max-width:min(480px,86%);box-shadow:5px 5px 0 rgba(10,10,20,.55);overflow:hidden;transform-origin:12% 88%;animation:pickSway 7s ease-in-out 1.6s infinite;display:block}
+@keyframes pickSway{0%,100%{transform:rotate(0deg) translateY(0)}50%{transform:rotate(-.6deg) translateY(-4px)}}
+.kv .pick::before{content:"";position:absolute;left:9px;top:10px;bottom:10px;width:7px;background-image:radial-gradient(circle,var(--muted) 2.2px,transparent 2.8px);background-size:7px 15px;background-repeat:repeat-y;opacity:.6}
+.kv .pick::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.55) 48%,transparent 64%);transform:translateX(-130%);pointer-events:none}
+.kv .pick:hover::after{transform:translateX(130%);transition:transform .8s ease}
+.kv .pick .flag{display:inline-block;background:var(--curtain);color:#fff;font-family:var(--round);font-weight:800;font-size:12.5px;border-radius:999px;padding:2px 12px;transform:rotate(-2deg)}
+.kv .pick .t{font-family:var(--round);font-weight:800;font-size:clamp(18px,2.6vw,24px);line-height:1.45;margin-top:8px;word-break:keep-all;line-break:strict}
+.kv .pick .go{font-size:13px;font-weight:900;color:var(--green-d);margin-top:4px}
+.kv .pick .seat{font-size:11.5px;color:var(--muted);letter-spacing:.1em}
 
-.hero{max-width:1120px;margin:0 auto;padding:72px 20px 54px;position:relative}
-.hero .kicker{font-size:12px;letter-spacing:.34em;color:var(--accent);font-weight:700;margin-bottom:18px}
-.hero h1{font-family:var(--serif);font-weight:800;font-size:clamp(38px,7vw,72px);line-height:1.25;letter-spacing:.02em}
-.hero h1 .num{color:var(--accent)}
-.hero p.lead{margin-top:22px;max-width:660px;color:var(--muted);font-size:18px}
-.stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:150px}
-.stat .v{font-family:var(--serif);font-size:30px;font-weight:800;line-height:1.1}
-.stat .v span{font-size:14px;color:var(--muted);font-family:var(--sans);font-weight:500}
-.stat .k{font-size:12px;color:var(--faint);letter-spacing:.14em;margin-top:4px}
+/* theater sign */
+.sign{margin-top:30px;background:var(--night);border-radius:20px;padding:10px;position:relative}
+.sign .inner{border:2px solid rgba(255,207,63,.55);border-radius:13px;padding:clamp(20px,3.6vw,36px);display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end}
+.sign .bulbs{position:absolute;inset:0;pointer-events:none}
+.sign h1{font-family:var(--round);font-weight:800;font-size:clamp(27px,4.4vw,42px);line-height:1.45;color:#fff8e6;word-break:keep-all;line-break:strict}
+.sign h1 .yl{color:var(--yellow)}
+.sign p{font-size:15px;color:#cfd2e4;max-width:34em;padding-bottom:6px}
+.sign p .upd{color:#9aa0b8;font-size:13.5px}
+.bulb-dot{position:absolute;width:9px;height:9px;border-radius:50%;background:#ffdf7e;box-shadow:0 0 10px 2px rgba(255,207,63,.55);animation:bulbGlow 1.8s ease-in-out infinite}
+.bulb-dot:nth-child(even){animation-delay:.9s}
+@keyframes bulbGlow{0%,100%{opacity:1}50%{opacity:.45}}
 
-main{max-width:1120px;margin:0 auto;padding:0 20px 40px}
-section.blk{margin-top:64px}
-.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:12px}
-.sec-head h2{font-family:var(--serif);font-size:28px;font-weight:800;letter-spacing:.04em}
-.sec-head .sub{color:var(--faint);font-size:14px}
+/* film strip marquee */
+.stripband{margin-top:30px;background:#101018;border-radius:8px;padding:7px 0 9px;overflow:hidden}
+.stripband .holes{height:8px;background-image:radial-gradient(ellipse 7px 4px at 10px 50%,#3c3c4c 98%,transparent);background-size:26px 8px;background-repeat:repeat-x;margin:0 6px 6px}
+.stripband .holes.b{margin:6px 6px 0}
+.marquee{overflow:hidden}
+.marquee .track{display:flex;white-space:nowrap;animation:mq 26s linear infinite;width:max-content}
+.marquee span{font-family:var(--round);font-weight:700;font-size:13.5px;letter-spacing:.14em;color:#e8e6da;padding-right:14px}
+.marquee .y{color:var(--yellow)}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media(max-width:900px){.cards{grid-template-columns:1fr}}
-.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:24px;cursor:pointer;transition:transform .25s,border-color .25s;display:flex;flex-direction:column;gap:10px}
-.card:hover{transform:translateY(-4px);border-color:var(--accent2)}
-.card .thumb{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
-.card .order{font-size:12px;letter-spacing:.22em;color:var(--accent);font-weight:900}
-.card h3{font-family:var(--serif);font-size:23px;font-weight:800;line-height:1.45}
-.card .meta{color:var(--muted);font-size:14px}
-.card .ov{color:#cfc7b4;font-size:16px;line-height:1.85}
-.card .foot{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
-.tag{font-size:12px;letter-spacing:.08em;background:var(--chip);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 10px}
-.tag.draft{color:#101408;background:var(--ok);border-color:var(--ok);font-weight:700}
-.tag.wait{color:var(--accent)}
+/* sections */
+.sec{margin-top:56px}
+.sec-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sec-head .ic{width:40px;height:40px;flex:none}
+.sec-head h2{font-family:var(--round);font-weight:800;font-size:26px}
+.sec-head .en{font-size:11px;letter-spacing:.26em;color:var(--muted);font-weight:700}
+.sec-head .sub{font-size:13px;color:var(--muted)}
 
-.tools{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}
-.tools input[type=search]{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:12px 16px;font-size:16px;font-family:var(--sans)}
-.tools input[type=search]:focus{outline:2px solid var(--accent2);outline-offset:1px}
-.tools select{background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:12px;font-size:15px;font-family:var(--sans)}
-.count-note{color:var(--faint);font-size:14px;margin-bottom:10px}
-ul.queue{list-style:none;border-top:1px solid var(--line)}
-ul.queue li{display:flex;align-items:center;gap:16px;padding:13px 8px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
-ul.queue li:hover{background:var(--panel)}
-.q-order{font-family:var(--serif);font-weight:800;color:var(--faint);width:52px;text-align:right;font-size:15px;flex:none}
+/* journal cards */
+.jcards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px 22px;margin-top:26px}
+@media(max-width:880px){.jcards{grid-template-columns:1fr}}
+.jcard{position:relative;background:#fff;border:2px solid var(--ink);border-radius:20px;padding:20px 20px 40px;transition:transform .35s ease,box-shadow .35s ease;display:block}
+.jcard:hover{transform:translateY(-5px);box-shadow:6px 8px 0 rgba(43,43,38,.16);opacity:1}
+.jcard .no{position:absolute;top:-16px;right:16px;font-family:var(--round);font-weight:800;font-size:34px;color:#fff;-webkit-text-stroke:1.6px var(--ink);text-shadow:2.5px 2.5px 0 var(--yellow);z-index:2}
+.jcard .thumb{border-radius:12px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);overflow:hidden;position:relative;background:linear-gradient(135deg,#8a93a8,#5d6579)}
+.jcard .thumb::before{content:"";position:absolute;top:0;left:0;right:0;height:14px;z-index:3;background:radial-gradient(circle at 10px -3px,transparent 8px,var(--curtain) 8.5px);background-size:20px 14px;background-repeat:repeat-x;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.jcard .thumb .tt{font-family:var(--round);font-weight:800;font-size:19px;color:#fff;text-align:center;line-height:1.45;padding:16px 14px 0;word-break:keep-all;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+.jcard .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.jcard .spec{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:12px;letter-spacing:.06em;font-weight:700}
+.jcard .lead{font-size:13.5px;color:#4c483c;margin-top:6px;line-height:1.8;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.jcard .rm{font-family:var(--round);font-weight:800;font-size:12.5px;letter-spacing:.14em;margin-top:10px;display:inline-block;border-bottom:2.5px solid var(--yellow)}
+.jcard .foot{margin-top:14px;border-top:1.6px dashed #d8d2ba;padding-top:10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:12.5px}
+.jcard .st{font-weight:900}
+.jcard .st.ok{color:var(--green-d)}
+.jcard .st.wait{color:#8a6d1a}
+.jcard .date{color:var(--muted)}
+.jcard .ttl{font-family:var(--round);font-weight:800;font-size:16.5px;line-height:1.55;margin-top:8px;word-break:keep-all;line-break:strict}
+.jcard .by{margin-top:8px;font-size:12.5px;color:var(--muted)}
+.gingham{position:absolute;left:0;right:0;bottom:0;height:14px;border-radius:0 0 18px 18px;background:repeating-linear-gradient(0deg,rgba(194,47,47,.25) 0 7px,rgba(255,255,255,0) 7px 14px),repeating-linear-gradient(90deg,rgba(194,47,47,.25) 0 7px,rgba(255,255,255,0) 7px 14px),#fff}
+
+/* list tools */
+.tools{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 14px}
+.tools input[type=search]{flex:1;min-width:220px;background:#fff;border:2px solid var(--ink);border-radius:12px;color:var(--ink);padding:11px 16px;font-size:16px;font-family:var(--sans)}
+.tools input[type=search]:focus{outline:3px solid var(--yellow);outline-offset:1px}
+.tools select{background:#fff;border:2px solid var(--ink);border-radius:12px;color:var(--ink);padding:11px;font-size:15px;font-family:var(--sans)}
+.count-note{color:var(--muted);font-size:13px;margin-bottom:6px}
+ul.queue{list-style:none}
+ul.queue li{display:flex;align-items:center;gap:14px;padding:13px 10px;border-bottom:1.6px dashed #d8d2ba;cursor:pointer}
+ul.queue li:hover{background:var(--cream)}
 .q-main{flex:1;min-width:0}
-.q-title{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.q-sub{color:var(--faint);font-size:13px}
-.q-chip{flex:none}
-.more{display:block;margin:22px auto 0;background:none;border:1px solid var(--accent2);color:var(--accent);border-radius:999px;padding:11px 30px;font-size:15px;font-family:var(--sans);cursor:pointer;letter-spacing:.1em}
-.more:hover{background:var(--chip)}
+.q-title{font-weight:700;font-size:16.5px}
+.q-sub{color:var(--muted);font-size:12.5px}
+.chip{flex:none;font-size:11.5px;font-weight:900;border-radius:999px;padding:2px 11px;border:1.6px solid var(--muted);color:var(--muted)}
+.chip.ok{background:#eef6ee;border-color:var(--green-d);color:var(--green-d)}
+.chip.mid{background:#fff;border-color:#c9a227;color:#8a6d1a}
+.more{display:block;margin:22px auto 0;background:var(--yellow);border:2px solid var(--ink);color:var(--ink);border-radius:999px;padding:10px 30px;font-size:14.5px;font-family:var(--round);font-weight:800;cursor:pointer;box-shadow:3px 3px 0 rgba(43,43,38,.9)}
+.more:hover{opacity:.85}
 
-.about{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px}
-.about p{color:#cfc7b4;max-width:760px;font-size:17px}
-.about p+p{margin-top:12px}
-.about b{color:var(--ink)}
+/* about */
+.about{margin-top:26px;background:var(--cream);border:2px dashed var(--green-d);border-radius:22px;padding:26px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px 36px}
+@media(max-width:880px){.about{grid-template-columns:1fr}}
+.about h3{font-family:var(--round);font-weight:800;font-size:18px;margin-bottom:6px}
+.about p{font-size:14.5px;color:#4c483c}
 
-footer.site{border-top:1px solid var(--line);margin-top:80px;padding:34px 20px 46px;text-align:center;color:var(--faint);font-size:14px}
-footer.site .brand{font-size:19px}
-
-.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:14px}
-.facts dt{color:var(--faint);font-size:12px;letter-spacing:.1em}
-.facts dd{font-weight:500}
-.empty{border:1px dashed var(--accent2);border-radius:12px;padding:16px 18px;color:var(--accent);font-size:14px;background:rgba(226,164,88,.05)}
-.src{font-size:12px;color:var(--faint);margin-top:8px}
-@media(max-width:640px){.facts{grid-template-columns:1fr}}
+/* footer */
+footer.site{margin-top:60px;text-align:center}
+footer.site .fl{font-family:var(--round);font-weight:800;font-size:21px}
+footer.site .fm{font-size:12.5px;color:var(--muted);margin-top:6px}
+footer.site .fm a{text-decoration:underline}
+#toTop{position:fixed;right:18px;bottom:18px;z-index:50;background:var(--night);color:#fff8e6;border:2px solid var(--yellow);border-radius:999px;font-family:var(--round);font-weight:800;font-size:12.5px;padding:9px 16px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s ease}
+#toTop.show{opacity:1;pointer-events:auto}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important;transition:none !important}.js .rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<div class="strip" aria-hidden="true"></div>
-<header class="site">
-  <div class="hd">
-    <a class="brand" href="#top">山田太郎<b>シネマ</b></a>
+<div class="sheet">
+  <header class="site">
+    <div class="logo">
+      <svg class="reel" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16.5" fill="#fffdf4" stroke="#2b2b26" stroke-width="2.6"/><circle cx="20" cy="20" r="3.6" fill="#2b2b26"/><g fill="#2b2b26"><circle cx="20" cy="10.5" r="3.4"/><circle cx="28.2" cy="24.8" r="3.4"/><circle cx="11.8" cy="24.8" r="3.4"/></g></svg>
+      山田太郎シネマ
+    </div>
     <nav>
-      <a href="#next">新着レビュー</a>
-      <a href="#queue">レビュー一覧</a>
-      <a href="#about">このサイトについて</a>
+      <a href="#next"><span class="en">REVIEWS</span>新着レビュー</a>
+      <a href="#queue"><span class="en">LIST</span>レビュー一覧</a>
+      <a href="#about"><span class="en">ABOUT</span>このサイトについて</a>
     </nav>
+  </header>
+
+  <div class="kv" id="top">
+    <svg viewBox="0 0 960 400" role="img" aria-label="夜の野外シネマのイラスト">
+      <rect width="960" height="400" fill="#1d2440"/>
+      <g fill="#fff8e6">
+        <circle class="star" cx="90" cy="52" r="3"/><circle class="star s2" cx="210" cy="30" r="2.4"/><circle class="star s3" cx="330" cy="64" r="2.8"/><circle class="star s2" cx="470" cy="26" r="2.2"/><circle class="star" cx="590" cy="56" r="2.6"/><circle class="star s3" cx="700" cy="30" r="2.3"/><circle class="star s2" cx="905" cy="120" r="2.6"/><circle class="star" cx="60" cy="130" r="2.3"/><circle class="star s3" cx="880" cy="36" r="2.8"/>
+      </g>
+      <path d="M838 44 a30 30 0 1 0 18 54 a24 24 0 1 1 -18 -54" fill="#ffdf7e"/>
+      <path d="M30 168 Q 240 128 470 156 T 930 140" stroke="#ffdf7e" stroke-width="2.4" fill="none"/>
+      <g>
+        <circle class="bulb" cx="120" cy="158" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="215" cy="146" r="6" fill="#ffdf7e"/><circle class="bulb" cx="312" cy="148" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="408" cy="154" r="6" fill="#ffdf7e"/><circle class="bulb" cx="505" cy="156" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="602" cy="152" r="6" fill="#ffdf7e"/><circle class="bulb" cx="700" cy="146" r="6" fill="#ffdf7e"/><circle class="bulb b2" cx="798" cy="142" r="6" fill="#ffdf7e"/><circle class="bulb" cx="888" cy="140" r="6" fill="#ffdf7e"/>
+      </g>
+      <path d="M0 306 Q 240 226 480 278 T 960 258 V400 H0Z" fill="#2e4a34"/>
+      <path d="M0 346 Q 300 292 620 330 T 960 318 V400 H0Z" fill="#223825"/>
+      <clipPath id="scrClip"><rect x="330" y="88" width="270" height="164"/></clipPath>
+      <g clip-path="url(#scrClip)">
+        <rect x="330" y="88" width="270" height="164" fill="#fdf6dd"/>
+        <g class="scene s1">
+          <rect x="330" y="88" width="270" height="164" fill="#fffbee"/>
+          <g class="scr-cloud" fill="#ffffff" opacity="0.9"><ellipse cx="404" cy="120" rx="27" ry="9"/><ellipse cx="428" cy="112" rx="18" ry="7"/><ellipse cx="528" cy="104" rx="21" ry="7"/></g>
+          <polygon points="382,232 465,116 548,232" fill="#f59a3c"/>
+          <circle class="scr-sun" cx="465" cy="152" r="16" fill="#ffcf3f" stroke="#2b2b26" stroke-width="3"/>
+          <path d="M428 204 q37 -30 74 0" fill="none" stroke="#2b2b26" stroke-width="3.4" stroke-linecap="round"/>
+        </g>
+        <g class="scene s2">
+          <rect x="330" y="88" width="270" height="164" fill="#31456e"/>
+          <g fill="#ffffff" opacity="0.85"><circle cx="368" cy="112" r="2"/><circle cx="420" cy="98" r="1.7"/><circle cx="560" cy="150" r="1.8"/><circle cx="386" cy="150" r="1.6"/></g>
+          <circle cx="522" cy="126" r="17" fill="#ffdf7e"/>
+          <circle cx="531" cy="120" r="15" fill="#31456e"/>
+          <g><polygon points="428,178 442,178 436,166" fill="#fffdf4"/><line x1="435" y1="166" x2="435" y2="182" stroke="#0e0e16" stroke-width="2.4"/><path d="M414 184 h44 l-7 9 h-30z" fill="#0e0e16"/></g>
+          <path class="waveA" d="M336 210 q14 -8 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0" fill="none" stroke="#aedce8" stroke-width="3" stroke-linecap="round"/>
+          <path class="waveB" d="M336 230 q14 -8 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0" fill="none" stroke="#7fb8cc" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g class="scene s3">
+          <rect x="330" y="88" width="270" height="164" fill="#f9a95e"/>
+          <circle cx="465" cy="200" r="32" fill="#e2572b"/>
+          <g class="birds" stroke="#5b3a29" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M492 118 q6 -6 12 0 q6 -6 12 0"/><path d="M528 140 q5 -5 10 0 q5 -5 10 0"/></g>
+          <path d="M330 252 V216 Q 430 202 600 222 V252Z" fill="#5b3a29"/>
+          <g><rect x="382" y="168" width="7" height="42" fill="#4a2e20"/><circle cx="385" cy="152" r="21" fill="#4a2e20"/><circle cx="366" cy="164" r="13" fill="#4a2e20"/><circle cx="404" cy="164" r="13" fill="#4a2e20"/></g>
+        </g>
+        <rect class="scr-shine" x="330" y="70" width="44" height="200" fill="#ffffff" opacity="0.16"/>
+        <path d="M330 88 h34 v164 h-34z M566 88 h34 v164 h-34z" fill="#a02323"/>
+      </g>
+      <rect x="330" y="88" width="270" height="164" rx="8" fill="none" stroke="#0e0e16" stroke-width="4"/>
+      <g>
+        <polygon class="beam" points="676,246 604,252 604,300 676,306" fill="#ffe9a8"/>
+        <g class="reelspin"><circle cx="674" cy="226" r="10" fill="#262f52" stroke="#0e0e16" stroke-width="3"/><circle cx="674" cy="226" r="2.6" fill="#0e0e16"/><circle cx="674" cy="219.5" r="2" fill="#0e0e16"/><circle cx="674" cy="232.5" r="2" fill="#0e0e16"/></g>
+        <g class="reelspin"><circle cx="693" cy="222" r="7.5" fill="#262f52" stroke="#0e0e16" stroke-width="3"/><circle cx="693" cy="222" r="2" fill="#0e0e16"/><circle cx="693" cy="217" r="1.6" fill="#0e0e16"/><circle cx="693" cy="227" r="1.6" fill="#0e0e16"/></g>
+        <rect x="668" y="238" width="30" height="44" rx="5" fill="#0e0e16"/>
+        <circle cx="683" cy="252" r="6" fill="#ffdf7e"/>
+      </g>
+      <g>
+        <rect x="140" y="302" width="180" height="50" rx="6" fill="#fff" stroke="#0e0e16" stroke-width="3"/>
+        <path d="M140 315 h180 M140 328 h180 M140 341 h180 M155 302 v50 M170 302 v50 M185 302 v50 M200 302 v50 M215 302 v50 M230 302 v50 M245 302 v50 M260 302 v50 M275 302 v50 M290 302 v50 M305 302 v50" stroke="#c22f2f" stroke-width="2" opacity="0.5"/>
+        <circle cx="200" cy="290" r="12" fill="#0e0e16"/><path d="M188 326 q12 -24 24 0 v26 h-24z" fill="#0e0e16"/>
+        <circle cx="256" cy="286" r="12" fill="#0e0e16"/><path d="M244 322 q12 -24 24 0 v30 h-24z" fill="#c22f2f"/>
+        <circle cx="716" cy="322" r="11" fill="#0e0e16"/><path d="M705 354 q11 -22 22 0 v18 h-22z" fill="#0e0e16"/>
+      </g>
+      <g fill="#ffe98a">
+        <circle class="firefly" cx="248" cy="330" r="2.8"/>
+        <circle class="firefly f2" cx="566" cy="356" r="2.4"/>
+        <circle class="firefly f3" cx="792" cy="306" r="2.6"/>
+      </g>
+    </svg>
+    <a class="pick rv" id="pickCard" href="articles/571.html" style="--d:.35s">
+      <span class="flag">今週の1本！！</span>
+      <div class="t" id="pickTitle"><span class="nobr">「ルックバック」——</span><br><span class="nobr">こんなに揺さぶられるなんて</span></div>
+      <div class="go">記事を読む →</div>
+      <div class="seat" id="pickSeat">58分 ・ 2024 ・ 2026.11.11 掲載</div>
+    </a>
   </div>
-</header>
 
-<div class="hero" id="top">
-  <div class="kicker">MOVIE REVIEWS &amp; NOTES</div>
-  <h1>映画の余韻を、<br><span class="num">言葉でもう一度</span>。</h1>
-  <p class="lead">映画を観終わったあと、誰かの感想や考察を読みたくなる——<br>そんな気持ちに応えるレビューサイトです。</p>
-      <p class="lead">感想と考察は結末までしっかり語ります。<br>更新は1日1本、ゆっくりと。</p>
-</div>
+  <div class="sign rv">
+    <div class="bulbs" id="signBulbs" aria-hidden="true"></div>
+    <div class="inner">
+      <h1>映画の余韻を、<br><span class="yl">言葉でもう一度。</span></h1>
+      <p><span class="nobr">映画を観終わったあと、</span><span class="nobr">誰かの感想や考察を読みたくなる——</span><span class="nobr">そんな気持ちに応えるレビューサイトです。</span><br><span class="nobr">感想と考察は結末までしっかり語ります。</span><br><span class="upd">更新は1日1本、ゆっくりと。</span></p>
+    </div>
+  </div>
 
-<main>
-  <section class="blk" id="next">
-    <div class="sec-head"><h2>新着レビュー</h2><span class="sub">最近の記事</span></div>
-    <div class="cards" id="nextCards"></div>
+  <div class="stripband" aria-hidden="true">
+    <div class="holes"></div>
+    <div class="marquee"><div class="track">
+      <span>YAMADA TARO CINEMA <span class="y">●</span> 映画の感想と考察 <span class="y">●</span> 更新は1日1本、ゆっくりと <span class="y">●</span> ネタバレあり <span class="y">●</span>&nbsp;</span>
+      <span>YAMADA TARO CINEMA <span class="y">●</span> 映画の感想と考察 <span class="y">●</span> 更新は1日1本、ゆっくりと <span class="y">●</span> ネタバレあり <span class="y">●</span>&nbsp;</span>
+      <span>YAMADA TARO CINEMA <span class="y">●</span> 映画の感想と考察 <span class="y">●</span> 更新は1日1本、ゆっくりと <span class="y">●</span> ネタバレあり <span class="y">●</span>&nbsp;</span>
+      <span>YAMADA TARO CINEMA <span class="y">●</span> 映画の感想と考察 <span class="y">●</span> 更新は1日1本、ゆっくりと <span class="y">●</span> ネタバレあり <span class="y">●</span>&nbsp;</span>
+    </div></div>
+    <div class="holes b"></div>
+  </div>
+
+  <section class="sec" id="next">
+    <div class="sec-head rv">
+      <svg class="ic" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16.5" fill="#fff" stroke="#2b2b26" stroke-width="2.6"/><circle cx="20" cy="20" r="3.6" fill="#2b2b26"/><g fill="#2b2b26"><circle cx="20" cy="10.5" r="3.4"/><circle cx="28.2" cy="24.8" r="3.4"/><circle cx="11.8" cy="24.8" r="3.4"/></g></svg>
+      <div><h2>新着レビュー</h2><div class="en">NEW REVIEWS</div></div>
+      <span class="sub">最近の記事</span>
+    </div>
+    <div class="jcards" id="nextCards"></div>
   </section>
 
-  <section class="blk" id="queue">
-    <div class="sec-head"><h2>レビュー一覧</h2><span class="sub">タイトル検索・年代で探せます ／ クリックで記事を開く</span></div>
+  <section class="sec" id="queue">
+    <div class="sec-head rv">
+      <svg class="ic" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="22" rx="4" fill="#ffcf3f" stroke="#2b2b26" stroke-width="2.6"/><polygon points="17,14 27,20 17,26" fill="#2b2b26"/></svg>
+      <div><h2>レビュー一覧</h2><div class="en">ALL REVIEWS</div></div>
+      <span class="sub">タイトル検索・年代で探せます ／ クリックで記事を開く</span>
+    </div>
     <div class="tools">
       <input type="search" id="q" placeholder="タイトルで検索（例：コナン、キングスマン）" aria-label="タイトル検索">
       <select id="decade" aria-label="年代で絞り込み">
@@ -144,75 +296,131 @@ footer.site .brand{font-size:19px}
     <button class="more" id="moreBtn" type="button">もっと見る</button>
   </section>
 
-  <section class="blk" id="about">
-    <div class="sec-head"><h2>このサイトについて</h2></div>
-    <div class="about">
-      <p><b>書いている人。</b>映画が好きで、年間100本以上を劇場と配信で観ています。このサイトでは、観た作品の感想と考察を、備忘録も兼ねて1日1本ずつ書いています。</p>
-      <p><b>更新。</b>新しい記事は1日1本ずつ追加しています。気になる作品は、タイトル検索や年代フィルターから探してみてください。</p>
-      <p><b>ネタバレについて。</b>感想と考察は、結末を含むネタバレありで書いています。まだ観ていない方はご注意ください。ネタバレなしで読めるのは、各記事の「あらすじ・概要」までです。</p>
+  <section class="sec" id="about">
+    <div class="sec-head rv">
+      <svg class="ic" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="10" fill="#ffcf3f" stroke="#2b2b26" stroke-width="2.4"/><g stroke="#2b2b26" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="2" x2="20" y2="6"/><line x1="20" y1="34" x2="20" y2="38"/><line x1="2" y1="20" x2="6" y2="20"/><line x1="34" y1="20" x2="38" y2="20"/><line x1="7" y1="7" x2="10" y2="10"/><line x1="30" y1="30" x2="33" y2="33"/><line x1="33" y1="7" x2="30" y2="10"/><line x1="10" y1="30" x2="7" y2="33"/></g></svg>
+      <div><h2>このサイトについて</h2><div class="en">ABOUT</div></div>
+    </div>
+    <div class="about rv">
+      <div>
+        <h3>書いている人</h3>
+        <p>映画が好きで、年間100本以上を劇場と配信で観ています。観た作品の感想と考察を、備忘録も兼ねて書いています。</p>
+      </div>
+      <div>
+        <h3>更新について</h3>
+        <p>新しい記事は1日1本ずつ追加しています。気になる作品は、タイトル検索や年代フィルターから探してみてください。</p>
+      </div>
+      <div>
+        <h3>ネタバレについて</h3>
+        <p>感想と考察は、結末を含むネタバレありで書いています。ネタバレなしで読めるのは、各記事の「あらすじ・概要」と「紹介ボックス」までです。</p>
+      </div>
     </div>
   </section>
-</main>
 
-<footer class="site">
-  <div class="brand">山田太郎<b>シネマ</b></div>
-  <p style="margin-top:8px">映画の感想と考察を、1日1本ずつ。作品情報の出典は各記事に明記しています。</p>
-  <p style="margin-top:8px"><a href="privacy.html">プライバシーポリシー</a></p>
-</footer>
+  <footer class="site">
+    <div class="fl">山田太郎シネマ</div>
+    <div class="fm">映画の感想と考察を、1日1本ずつ。 ・ <a href="privacy.html">プライバシーポリシー</a></div>
+  </footer>
+</div>
+
+<button id="toTop" type="button">↑ トップへ</button>
 
 <script src="data.js"></script>
 <script src="drafts.js"></script>
 <script>
-
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const byNo = {}; FILMS.forEach(f => byNo[f.no] = f);
+const runtimeOf = d => { const f = (d.facts || []).find(x => x[0] === "上映時間"); return f ? f[1] : ""; };
+const dots = s => s ? s.replace(/-/g, ".") : "";
 
-function cardHTML(f){
+/* sign bulbs */
+(() => {
+  const wrap = $("#signBulbs");
+  const pos = [3, 14.5, 26, 37.5, 49, 60.5, 72, 83.5, 95];
+  pos.forEach(p => {
+    ["top:6px", "bottom:6px"].forEach(v => {
+      const s = document.createElement("span");
+      s.className = "bulb-dot";
+      s.style.cssText = "left:" + p + "%;" + v;
+      wrap.appendChild(s);
+    });
+  });
+})();
+
+/* pick card （今週の1本） */
+(() => {
+  const pubs = FILMS.filter(f => DRAFTS[f.no] && DRAFTS[f.no].published);
+  if (!pubs.length) return;
+  const f = pubs.find(x => DRAFTS[x.no].pick) || pubs[0];
   const d = DRAFTS[f.no];
-  return `<img class="thumb" src="images/${f.no}.svg" alt="" loading="lazy">
-    <div class="order">${d.date ? esc(d.date) + ' 公開' : 'NEW REVIEW'}</div>
-    <h3>${esc(f.title)}</h3>
-    <div class="meta">${f.year}年製作</div>
-    <p class="ov">${esc(d.overview)}</p>
-    <div class="foot">${d.published ? '<span class="tag draft">公開中</span>' : d.impression ? '<span class="tag draft">レビュー</span>' : '<span class="tag draft">レビュー</span><span class="tag wait">感想は準備中</span>'}</div>`;
-}
-const nextWrap = $("#nextCards");
-FILMS.slice(0,3).forEach(f => {
-  const el = document.createElement("article");
-  el.className = "card"; el.innerHTML = cardHTML(f);
-  el.addEventListener("click", () => { location.href = "articles/" + f.no + ".html"; });
-  nextWrap.appendChild(el);
-});
+  const card = $("#pickCard");
+  card.href = "articles/" + f.no + ".html";
+  if (d.headline) {
+    $("#pickTitle").innerHTML = d.headline.split("\n").map(l => '<span class="nobr">' + esc(l) + "</span>").join("<br>");
+  } else {
+    $("#pickTitle").innerHTML = '<span class="fname">『' + esc(f.title) + "』</span>";
+  }
+  const rt = runtimeOf(d);
+  $("#pickSeat").textContent = [rt, f.year, dots(d.date) + " 掲載"].filter(Boolean).join(" ・ ");
+})();
 
-// decade select
-const decades = [...new Set(FILMS.map(f => Math.floor(f.year/10)*10))].sort((a,b)=>b-a);
+/* journal cards （新着レビュー） */
+(() => {
+  const wrap = $("#nextCards");
+  const grads = ["linear-gradient(135deg,#f0685e,#d92f24)", "linear-gradient(135deg,#5d88e8,#2f55b8)", "linear-gradient(135deg,#55b877,#2c7f47)", "linear-gradient(135deg,#b07fd4,#7a4ba8)", "linear-gradient(135deg,#e8a34c,#b96f1e)"];
+  FILMS.filter(f => DRAFTS[f.no]).slice(0, 3).forEach((f, i) => {
+    const d = DRAFTS[f.no];
+    const a = document.createElement("a");
+    a.className = "jcard rv";
+    a.style.setProperty("--d", (i * 0.12) + "s");
+    a.href = "articles/" + f.no + ".html";
+    const rt = runtimeOf(d);
+    const st = d.published
+      ? '<span class="st ok">公開中</span><span class="date">' + esc(dots(d.date)) + " 掲載</span>"
+      : d.impression
+        ? '<span class="st wait">感想あり・公開準備中</span>'
+        : '<span class="st wait">感想は準備中</span>';
+    a.innerHTML =
+      '<div class="no">' + String(i + 1).padStart(2, "0") + "</div>" +
+      '<div class="thumb" style="background:' + grads[i % grads.length] + '"><span class="tt">' + esc(f.title) + '</span><img src="images/' + f.no + '.svg" alt="" loading="lazy" onerror="this.remove()"></div>' +
+      '<div class="spec">' + (rt ? "<span>" + esc(rt) + "</span>" : "") + "<span>" + f.year + "</span></div>" +
+      '<p class="lead">' + esc(d.overview || "") + "</p>" +
+      '<span class="rm">READ MORE</span>' +
+      '<div class="ttl">' + esc(f.title) + "</div>" +
+      '<div class="by">山田太郎</div>' +
+      '<div class="foot">' + st + "</div>" +
+      '<div class="gingham"></div>';
+    wrap.appendChild(a);
+  });
+})();
+
+/* decade select */
+const decades = [...new Set(FILMS.map(f => Math.floor(f.year / 10) * 10))].sort((a, b) => b - a);
 const sel = $("#decade");
-decades.forEach(d => { const o=document.createElement("option"); o.value=d; o.textContent = d+"年代"; sel.appendChild(o); });
+decades.forEach(d => { const o = document.createElement("option"); o.value = d; o.textContent = d + "年代"; sel.appendChild(o); });
 
 let shown = 60;
-function filtered(){
+function filtered() {
   const q = $("#q").value.trim();
   const dc = sel.value;
-  return FILMS.filter(f => (!q || f.title.includes(q)) && (!dc || Math.floor(f.year/10)*10 === Number(dc)));
+  return FILMS.filter(f => (!q || f.title.includes(q)) && (!dc || Math.floor(f.year / 10) * 10 === Number(dc)));
 }
-function renderQueue(){
+function renderQueue() {
   const list = filtered();
   const ul = $("#queueList"); ul.innerHTML = "";
   list.slice(0, shown).forEach(f => {
     const li = document.createElement("li");
     const dd = DRAFTS[f.no];
-    const chip = dd && dd.published ? '<span class="tag draft q-chip">公開中</span>' : dd ? '<span class="tag draft q-chip">レビューあり</span>' : '<span class="tag q-chip">準備中</span>';
-    li.innerHTML = `
-      <span class="q-main"><span class="q-title">${esc(f.title)}</span><br><span class="q-sub">${f.year}年製作</span></span>${chip}`;
-    if (dd){
+    const chip = dd && dd.published ? '<span class="chip ok">公開中</span>' : dd ? '<span class="chip mid">レビューあり</span>' : '<span class="chip">準備中</span>';
+    li.innerHTML = '<span class="q-main"><span class="q-title">' + esc(f.title) + '</span><br><span class="q-sub">' + f.year + "年製作</span></span>" + chip;
+    if (dd) {
       li.addEventListener("click", () => { location.href = "articles/" + f.no + ".html"; });
     } else {
       li.style.cursor = "default";
     }
     ul.appendChild(li);
   });
-  $("#countNote").textContent = `${list.length}作品中 ${Math.min(shown, list.length)}作品を表示`;
+  $("#countNote").textContent = list.length + "作品中 " + Math.min(shown, list.length) + "作品を表示";
   $("#moreBtn").style.display = list.length > shown ? "" : "none";
 }
 $("#moreBtn").addEventListener("click", () => { shown += 60; renderQueue(); });
@@ -220,6 +428,19 @@ $("#q").addEventListener("input", () => { shown = 60; renderQueue(); });
 sel.addEventListener("change", () => { shown = 60; renderQueue(); });
 renderQueue();
 
+/* reveal + toTop */
+(() => {
+  const els = document.querySelectorAll(".rv");
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { threshold: .12 });
+    els.forEach(e => io.observe(e));
+  } else { els.forEach(e => e.classList.add("in")); }
+  const btn = $("#toTop");
+  addEventListener("scroll", () => { btn.classList.toggle("show", scrollY > 600); }, { passive: true });
+  btn.addEventListener("click", () => { scrollTo({ top: 0, behavior: "smooth" }); });
+})();
 </script>
 </body>
 </html>
