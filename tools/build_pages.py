@@ -62,7 +62,6 @@ article.body h3{font-family:var(--round);font-weight:700;font-size:19px;margin:3
 .introbox{background:#eef6ee;border:2.5px solid var(--green-d);border-radius:20px;padding:22px 24px;margin:28px 0 6px}
 .introbox .ib-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .introbox .ib-head .t{font-family:var(--round);font-weight:800;font-size:18.5px}
-.introbox .ns{margin-left:auto;background:#fff;border:1.6px solid var(--green-d);color:var(--green-d);border-radius:999px;font-size:11.5px;font-weight:900;padding:2px 11px}
 .introbox .ib-lead{font-weight:900;font-size:16px;margin-top:9px;line-height:1.8}
 .introbox .ib-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px 26px;margin-top:14px}
 @media(max-width:640px){.introbox .ib-cols{grid-template-columns:1fr}}
@@ -234,7 +233,7 @@ def intro_block(d):
     return (
         '<div class="introbox rv">'
         '<div class="ib-head"><span class="t">この映画、こんな作品です</span>'
-        '<span class="ns">ネタバレなし</span></div>'
+        '</div>'
         f'<div class="ib-lead">{esc(intro["lead"])}</div>'
         f'<div class="ib-cols">{cols}</div>'
         f"{watch}</div>"
