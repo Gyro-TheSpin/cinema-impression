@@ -434,37 +434,6 @@ def make_intro(title, year, overview, facts_list):
         director = (facts.get("監督") or "").split("、")[0]
         lead = f"{year}年公開" + (f"、{director}監督" if director else "") + "の作品。"
 
-    recommend = []
-    director = (facts.get("監督") or "").split("、")[0]
-    if director:
-        recommend.append(f"{director}監督の作品が好きな人")
-    orig = facts.get("原作") or ""
-    m = re.search(r"『([^』]+)』", orig)
-    if m and re.search(r"[ぁ-んァ-ヶ一-龥]", m.group(1)):
-        recommend.append(f"原作『{m.group(1)}』が好きな人")
-    theme_rec = [
-        ("実話", "実話を基にした物語が好きな人"),
-        ("内戦", "社会の分断を描く作品に興味がある人"),
-        ("戦争", "戦争を描いた作品が好きな人"),
-        ("宇宙", "宇宙を舞台にしたSFが好きな人"),
-        ("SF", "SF映画が好きな人"),
-        ("スパイ", "スパイ映画が好きな人"),
-        ("アクション", "アクション映画が好きな人"),
-        ("ミステリー", "ミステリーが好きな人"),
-        ("謎", "謎解きの物語が好きな人"),
-        ("友情", "友情の物語が好きな人"),
-    ]
-    for kw, phrase in theme_rec:
-        if kw in text and phrase not in recommend:
-            recommend.append(phrase)
-        if len(recommend) >= 3:
-            break
-    if len(recommend) < 3:
-        star = (facts.get("出演") or "").split("、")[0]
-        if star:
-            recommend.append(f"{star}のファン")
-    recommend = recommend[:3]
-
     highlights = []
     if "アカデミー賞" in text:
         highlights.append("アカデミー賞など賞レースでも話題になった評価作")
@@ -497,9 +466,9 @@ def make_intro(title, year, overview, facts_list):
         highlights.append(f"音楽は{music}が担当")
     highlights = highlights[:3]
 
+    # 「こんな人におすすめ」は本人のレビュー内容から作るため、自動生成では付けない
+    # （感想が付いた時点で impressions/<no>.intro.json から差し込む）。
     intro = {"lead": lead}
-    if recommend:
-        intro["recommend"] = recommend
     if highlights:
         intro["highlights"] = highlights
     return intro
