@@ -362,6 +362,94 @@ def first_sentences(text, limit=350):
     return out
 
 
+# 公式予告編の自動紐づけで信頼するYouTubeチャンネル名（部分一致）。
+TRUSTED_CHANNELS = [
+    "東宝MOVIEチャンネル", "ワーナー ブラザース 公式", "Warner Bros.",
+    "松竹", "日活", "KADOKAWA", "東映", "ギャガ", "ハピネット",
+    "シネマトゥデイ", "MOVIE WALKER", "moviecollectionjp",
+    "avex", "ポニーキャニオン", "アニプレックス", "Netflix",
+    "Disney", "20th Century", "Paramount", "A24", "YouTube Movies",
+    "Rotten Tomatoes", "フリュー", "アスミック・エース", "クロックワークス",
+]
+
+
+def _norm_text(s):
+    import unicodedata
+    s = unicodedata.normalize("NFKC", s or "")
+    return re.sub(r"[\s　・:：『』「」【】\[\]（）()]", "", s).lower()
+
+
+def _yt_search(query, limit=12):
+    """YouTube検索結果ページから (videoId, タイトル, チャンネル名) を取り出す。"""
+    url = "https://www.youtube.com/results?search_query=" + urllib.parse.quote(query)
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=25) as r:
+        html = r.read().decode("utf-8", "ignore")
+    m = re.search(r"var ytInitialData = (\{.*?\});</script>", html, re.S)
+    if not m:
+        return []
+    data = json.loads(m.group(1))
+    out = []
+
+    def text_of(node):
+        if not isinstance(node, dict):
+            return ""
+        if "simpleText" in node:
+            return node["simpleText"]
+        return "".join(r.get("text", "") for r in node.get("runs", []))
+
+    def walk(node):
+        if isinstance(node, dict):
+            vr = node.get("videoRenderer")
+            if vr and vr.get("videoId"):
+                out.append((
+                    vr["videoId"],
+                    text_of(vr.get("title", {})),
+                    text_of(vr.get("ownerText", {}) or vr.get("longBylineText", {})),
+                ))
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+
+    walk(data)
+    return out[:limit]
+
+
+def find_trailer(title, year):
+    """公式予告編のYouTube IDを返す。確信が持てなければ None（手動で紐づける）。
+    失敗しても下書き作成は止めない（呼び出し側で例外を握る前提だが、ここでも握る）。"""
+    try:
+        cands = _yt_search(f"{title} {year} 予告編")
+    except Exception as e:
+        print(f"  予告編の検索に失敗（スキップ）: {e}")
+        return None
+    nt = _norm_text(title)
+    best, best_score = None, 0
+    for vid, vt, ch in cands:
+        nvt = _norm_text(vt)
+        if nt not in nvt:
+            continue  # 作品名がタイトルに入っていないものは別作品として除外
+        if not any(k in vt for k in ("予告", "トレーラー", "Trailer", "TRAILER")):
+            continue
+        score = 1
+        if "本予告" in vt:
+            score += 2
+        if "公式" in vt:
+            score += 1
+        if any(t.lower() in (ch or "").lower() for t in TRUSTED_CHANNELS):
+            score += 2
+        if "特報" in vt or "ティザー" in vt or "Teaser" in vt:
+            score -= 2  # ティザーより本予告を優先
+        if score > best_score:
+            best, best_score = (vid, vt, ch), score
+    if best and best_score >= 3:
+        print(f"  予告編を紐づけ: {best[1]}（{best[2]}） https://www.youtube.com/watch?v={best[0]}")
+        return best[0]
+    return None
+
+
 def main():
     dry_run = "--dry-run" in sys.argv
     # 週1回（月曜 JST）だけ Filmarks と差分同期する。失敗しても下書き作成は続ける。
@@ -419,6 +507,13 @@ def main():
             draft["spoiler_overview"] = (
                 summarize_spoiler_with_gemini(t["title"], plot) or first_sentences(plot, limit=1500)
             )
+        try:
+            trailer = find_trailer(t["title"], t["year"])
+        except Exception as e:
+            print(f"  予告編の紐づけをスキップ: {e}")
+            trailer = None
+        if trailer:
+            draft["trailer"] = trailer
         drafts[str(t["queue_no"])] = draft
         t["status"] = "drafted"
         print(f"  下書きを作成: {t['title']}")

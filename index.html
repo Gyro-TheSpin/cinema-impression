@@ -13,7 +13,7 @@
 <script>document.documentElement.className += ' js';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Kurenaido&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#fffdf4; --cream:#fff8e6; --ink:#2b2b26; --muted:#7a7563;
@@ -169,6 +169,30 @@ footer.site .fm a{text-decoration:underline}
 #toTop{position:fixed;right:18px;bottom:18px;z-index:50;background:var(--night);color:#fff8e6;border:2px solid var(--yellow);border-radius:999px;font-family:var(--round);font-weight:800;font-size:12.5px;padding:9px 16px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s ease}
 #toTop.show{opacity:1;pointer-events:auto}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important;transition:none !important}.js .rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+
+/* --- human touches --- */
+.kv .pick{rotate:-1.2deg}
+.kv .pick .tape{position:absolute;top:0;left:38px;width:96px;height:19px;background:linear-gradient(100deg,rgba(255,231,140,.85),rgba(255,214,90,.75));opacity:.85;transform:rotate(-2.5deg);box-shadow:0 1px 2px rgba(0,0,0,.15);z-index:2}
+.kv .pick .memo{font-family:'Zen Kurenaido',cursive;font-size:15.5px;color:#3d3a2e;margin-top:7px;transform:rotate(-.6deg);line-height:1.5}
+.kv .pick .memo .sq{border-bottom:3px solid rgba(217,47,36,.55);border-radius:2px;padding-bottom:1px}
+.kv .pick .memo .star{color:#d92f24;font-size:14px}
+.sign::before{content:"";position:absolute;top:-11px;left:42px;width:104px;height:24px;background:linear-gradient(100deg,rgba(255,241,190,.9),rgba(255,231,140,.8));transform:rotate(-4deg);box-shadow:0 1px 3px rgba(0,0,0,.25);z-index:3;border-radius:1px}
+.sticky{position:absolute;right:26px;bottom:-20px;transform:rotate(3deg);background:#ffef9e;color:#3d3a2e;font-family:'Zen Kurenaido',cursive;padding:12px 16px 10px;box-shadow:2px 4px 10px rgba(0,0,0,.35);z-index:4;line-height:1.45;border-radius:2px}
+.sticky::before{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-2deg);width:64px;height:18px;background:rgba(255,255,255,.5);box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.sticky .b{font-size:17px}
+.sticky .s{font-size:12.5px}
+@media(max-width:700px){.sticky{right:12px;bottom:-24px;padding:9px 12px 8px}.sticky .b{font-size:15px}}
+@media(max-width:700px){
+  .kv-photo{aspect-ratio:16/10}
+  .kv .pick{left:12px;bottom:12px;max-width:76%;padding:10px 14px 9px 24px;border-radius:5px 14px 14px 5px;box-shadow:3px 3px 0 rgba(10,10,20,.55)}
+  .kv .pick::before{left:7px;width:5px;background-size:5px 11px}
+  .kv .pick .tape{left:26px;width:70px;height:15px}
+  .kv .pick .flag{font-size:10.5px;padding:1px 9px}
+  .kv .pick .t{font-size:15.5px;line-height:1.4;margin-top:6px}
+  .kv .pick .memo{font-size:13px;margin-top:5px}
+  .kv .pick .go{font-size:11.5px;margin-top:2px}
+  .kv .pick .seat{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -188,8 +212,9 @@ footer.site .fm a{text-decoration:underline}
   <div class="kv" id="top">
     <img class="kv-photo" src="https://images.pexels.com/photos/2507025/pexels-photo-2507025.jpeg?auto=compress&w=1260&h=750&dpr=1" alt="海辺の野外シネマの写真"><div class="kv-shade"></div><div class="kv-credit">写真：Quark Studio / Pexels（フリー素材）</div>
     <a class="pick rv" id="pickCard" href="articles/571.html" style="--d:.35s">
-      <span class="flag">今週の1本！！</span>
+      <span class="tape" aria-hidden="true"></span><span class="flag">今週の1本！！</span>
       <div class="t" id="pickTitle"><span class="nobr">「ルックバック」——</span><br><span class="nobr">こんなに揺さぶられるなんて</span></div>
+      <div class="memo" id="pickMemo" hidden></div>
       <div class="go">記事を読む →</div>
       <div class="seat" id="pickSeat">58分 ・ 2024 ・ 2026.11.11 掲載</div>
     </a>
@@ -201,6 +226,7 @@ footer.site .fm a{text-decoration:underline}
       <h1>映画の余韻を、<br><span class="yl">言葉でもう一度。</span></h1>
       <p><span class="nobr">映画を観終わったあと、</span><span class="nobr">誰かの感想や考察を読みたくなる——</span><span class="nobr">そんな気持ちに応えるレビューサイトです。</span><br><span class="nobr">感想と考察は結末までしっかり語ります。</span><br><span class="upd">更新は1日1本、ゆっくりと。</span></p>
     </div>
+    <div class="sticky" aria-hidden="true"><span class="b">ネタバレ注意！</span><br><span class="s">感想は結末まで書いてます</span></div>
   </div>
 
   <div class="stripband" aria-hidden="true">
@@ -306,6 +332,7 @@ const dots = s => s ? s.replace(/-/g, ".") : "";
   }
   const rt = runtimeOf(d);
   $("#pickSeat").textContent = [rt, f.year, dots(d.date) + " 掲載"].filter(Boolean).join(" ・ ");
+  if (d.memo) { const m = $("#pickMemo"); m.innerHTML = '<span class="star">★</span> <span class="sq">' + esc(d.memo) + "</span>"; m.hidden = false; }
 })();
 
 /* journal cards （新着レビュー） */
@@ -326,7 +353,7 @@ const dots = s => s ? s.replace(/-/g, ".") : "";
         : '<span class="st wait">感想は準備中</span>';
     a.innerHTML =
       '<div class="no">' + String(i + 1).padStart(2, "0") + "</div>" +
-      '<div class="thumb" style="background:' + grads[i % grads.length] + '"><span class="tt">' + esc(f.title) + '</span><img src="images/' + f.no + '.svg" alt="" loading="lazy" onerror="this.remove()"></div>' +
+      '<div class="thumb" style="background:' + grads[i % grads.length] + '"><span class="tt">' + esc(f.title) + '</span><img src="' + (d.trailer ? "https://i.ytimg.com/vi/" + d.trailer + "/hqdefault.jpg" : "images/" + f.no + ".svg") + '" alt="" loading="lazy" onerror="this.remove()"></div>' +
       '<div class="spec">' + (rt ? "<span>" + esc(rt) + "</span>" : "") + "<span>" + f.year + "</span></div>" +
       '<p class="lead">' + esc(d.overview || "") + "</p>" +
       '<span class="rm">READ MORE</span>' +
