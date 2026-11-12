@@ -46,20 +46,21 @@ def find_queue():
     raise SystemExit("queue CSV が見つかりません: " + " / ".join(candidates))
 
 
-def wiki_summary(title, year):
-    """日本語版 Wikipedia で作品ページを探し、リード文とURLと基本情報を返す。"""
+def _search_pages(title, limit=5, intro_only=True):
+    """Wikipedia検索の候補ページを検索順で返す。"""
     api = "https://ja.wikipedia.org/w/api.php"
     params = {
         "action": "query",
         "prop": "extracts|info",
         "explaintext": "1",
-        "exintro": "1",
         "inprop": "url",
         "format": "json",
         "generator": "search",
         "gsrsearch": f"{title} 映画",
-        "gsrlimit": "1",
+        "gsrlimit": str(limit),
     }
+    if intro_only:
+        params["exintro"] = "1"
     req = urllib.request.Request(
         api + "?" + urllib.parse.urlencode(params),
         headers={"User-Agent": "movie-blog-draft/1.0 (personal project)"},
@@ -67,15 +68,88 @@ def wiki_summary(title, year):
     with urllib.request.urlopen(req, timeout=30) as r:
         data = json.load(r)
     pages = (data.get("query") or {}).get("pages") or {}
-    if not pages:
+    return sorted(pages.values(), key=lambda p: p.get("index", 99))
+
+
+def _pick_page(pages, year, title=None):
+    """候補ページの誤爆（同名の別作品・続編）を避けて選ぶ。
+
+    優先順: ①ページタイトルが作品名と一致 ②リード文の最初の年が目標年±1
+    （公開年の地域差を許容） ③検索順の先頭。
+    """
+    if title:
+        for p in pages:
+            if p.get("title") == title:
+                return p
+    for p in pages:
+        m = re.search(r"(\d{4})年", p.get("extract") or "")
+        if m and abs(int(m.group(1)) - int(year)) <= 1:
+            return p
+    return pages[0] if pages else None
+
+
+def _page_by_title(title, intro_only=True):
+    """タイトル完全一致でページを直接引く（曖昧さ回避ページは None）。"""
+    api = "https://ja.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "prop": "extracts|info",
+        "explaintext": "1",
+        "inprop": "url",
+        "format": "json",
+        "titles": title,
+        "redirects": "1",
+    }
+    if intro_only:
+        params["exintro"] = "1"
+    req = urllib.request.Request(
+        api + "?" + urllib.parse.urlencode(params),
+        headers={"User-Agent": "movie-blog-draft/1.0 (personal project)"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.load(r)
+    except Exception:
         return None
-    page = next(iter(pages.values()))
+    pages = (data.get("query") or {}).get("pages") or {}
+    for p in pages.values():
+        if "missing" in p:
+            return None
+        ex = p.get("extract") or ""
+        if not ex.strip() or "曖昧さ回避" in ex[:200]:
+            return None
+        return p
+    return None
+
+
+def wiki_summary(title, year):
+    """日本語版 Wikipedia で作品ページを探し、リード文とURLと基本情報を返す。"""
+    page = _page_by_title(title, intro_only=True)
+    if page is None:
+        pages = _search_pages(title, limit=5, intro_only=True)
+        if not pages:
+            return None
+        page = _pick_page(pages, year, title)
     extract = (page.get("extract") or "").strip()
     return {"extract": extract, "url": page.get("fullurl", ""), "page_title": page.get("title", "")}
 
 
+def _unwrap_templates(v):
+    """データを持つテンプレートを先に展開する（中身ごと消えるのを防ぐ）。"""
+    v = re.sub(r"\{\{仮リンク\|([^|{}]+)(?:\|[^{}]*)?\}\}", r"\1", v)
+    def _ub(m):
+        args = [a for a in m.group(1).split("|") if "=" not in a]
+        return "\n".join(args)
+    v = re.sub(r"\{\{(?:Unbulleted list|Plainlist|plainlist)\|([^{}]*)\}\}", _ub, v)
+    return v
+
+
 def _clean_wiki_value(v):
-    v = re.sub(r"\{\{[^{}]*\}\}", "", v)  # テンプレート除去
+    v = _unwrap_templates(v)
+    prev = None
+    while prev != v:  # テンプレート除去（入れ子対応で内側から繰り返す）
+        prev = v
+        v = re.sub(r"\{\{[^{}]*\}\}", "", v)
     v = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", v)  # [[a|b]]→b, [[a]]→a
     v = re.sub(r"<[^>]+>", "\n", v)  # <br> 等は区切りに
     v = re.sub(r"'{2,3}", "", v)
@@ -99,7 +173,7 @@ def wiki_facts(page_title):
     except Exception:
         return []
     fields = {}
-    for m in re.finditer(r"^\|\s*([^=|]+?)\s*=\s*(.+)$", wikitext, re.M):
+    for m in re.finditer(r"^\|[ \t]*([^=|\n]+?)[ \t]*=[ \t]*(.*)$", wikitext, re.M):
         fields[m.group(1).strip()] = m.group(2).strip()
     facts = []
     def add(label, keys, limit=None, joiner="、"):
@@ -117,7 +191,7 @@ def wiki_facts(page_title):
     add("出演", ["出演者", "出演"], limit=6)
     add("音楽", ["音楽"])
     if "公開" in fields:
-        m = re.search(r"(\d{4})年(\d{1,2})月(\d{1,2})日", fields["公開"])
+        m = re.search(r"\{\{Film date\|(\d{4})\|(\d{1,2})\|(\d{1,2})", fields["公開"]) or re.search(r"(\d{4})年(\d{1,2})月(\d{1,2})日", fields["公開"])
         if m:
             facts.append(["公開", f"{m.group(1)}年{int(m.group(2))}月{int(m.group(3))}日"])
     if "上映時間" in fields:
@@ -131,31 +205,18 @@ def wiki_facts(page_title):
 NEXT_HEADINGS = ["登場人物", "キャスト", "声の出演", "スタッフ", "制作", "製作", "公開", "評価", "興行成績", "脚注", "出典", "関連項目", "外部リンク", "主題歌", "音楽"]
 
 
-def wiki_plot(title):
+def wiki_plot(title, year=None):
     """Wikipedia全文から「あらすじ」セクション（結末まで含む）を切り出す。見つからなければ None。"""
-    api = "https://ja.wikipedia.org/w/api.php"
-    params = {
-        "action": "query",
-        "prop": "extracts",
-        "explaintext": "1",
-        "format": "json",
-        "generator": "search",
-        "gsrsearch": f"{title} 映画",
-        "gsrlimit": "1",
-    }
-    req = urllib.request.Request(
-        api + "?" + urllib.parse.urlencode(params),
-        headers={"User-Agent": "movie-blog-draft/1.0 (personal project)"},
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            data = json.load(r)
-    except Exception:
-        return None
-    pages = (data.get("query") or {}).get("pages") or {}
-    if not pages:
-        return None
-    text = next(iter(pages.values())).get("extract") or ""
+    page = _page_by_title(title, intro_only=False)
+    if page is None:
+        try:
+            pages = _search_pages(title, limit=5, intro_only=False)
+        except Exception:
+            return None
+        if not pages:
+            return None
+        page = _pick_page(pages, year, title) if year else pages[0]
+    text = page.get("extract") or ""
     lines = [ln.strip() for ln in text.splitlines()]
 
     def heading(ln):
@@ -302,7 +363,7 @@ def main():
             "facts": [["製作年", f"{t['year']}年"]] + wiki_facts(info["page_title"]),
             "source": [f"Wikipedia「{info['page_title']}」", info["url"]],
         }
-        plot = wiki_plot(t["title"])
+        plot = wiki_plot(t["title"], t["year"])
         if plot:
             draft["spoiler_overview"] = (
                 summarize_spoiler_with_gemini(t["title"], plot) or first_sentences(plot, limit=1500)
