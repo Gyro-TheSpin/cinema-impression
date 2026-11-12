@@ -417,6 +417,94 @@ def _yt_search(query, limit=12):
     return out[:limit]
 
 
+def make_intro(title, year, overview, facts_list):
+    """紹介ボックス（この映画、こんな作品です）の仮生成。
+    事実データ（概要・作品情報）だけから作り、感想めいた表現は入れない。
+    本人の感想が付いたら impressions/<no>.intro.json で差し替える前提の仮置き。"""
+    facts = {k: v for k, v in facts_list}
+    text = overview or ""
+
+    # lead: 概要の1文目から『タイトル』（原題…）は、の定義部を外す
+    first = text.split("。")[0].strip()
+    lead = re.sub(r"^『[^』]+』（[^）]+）は、?", "", first)
+    lead = re.sub(r"^『[^』]+』は、?", "", lead)
+    if lead and not lead.endswith("。"):
+        lead += "。"
+    if len(lead) < 12 or "上記" in lead or "本項" in lead:
+        director = (facts.get("監督") or "").split("、")[0]
+        lead = f"{year}年公開" + (f"、{director}監督" if director else "") + "の作品。"
+
+    recommend = []
+    director = (facts.get("監督") or "").split("、")[0]
+    if director:
+        recommend.append(f"{director}監督の作品が好きな人")
+    orig = facts.get("原作") or ""
+    m = re.search(r"『([^』]+)』", orig)
+    if m and re.search(r"[ぁ-んァ-ヶ一-龥]", m.group(1)):
+        recommend.append(f"原作『{m.group(1)}』が好きな人")
+    theme_rec = [
+        ("実話", "実話を基にした物語が好きな人"),
+        ("内戦", "社会の分断を描く作品に興味がある人"),
+        ("戦争", "戦争を描いた作品が好きな人"),
+        ("宇宙", "宇宙を舞台にしたSFが好きな人"),
+        ("SF", "SF映画が好きな人"),
+        ("スパイ", "スパイ映画が好きな人"),
+        ("アクション", "アクション映画が好きな人"),
+        ("ミステリー", "ミステリーが好きな人"),
+        ("謎", "謎解きの物語が好きな人"),
+        ("友情", "友情の物語が好きな人"),
+    ]
+    for kw, phrase in theme_rec:
+        if kw in text and phrase not in recommend:
+            recommend.append(phrase)
+        if len(recommend) >= 3:
+            break
+    if len(recommend) < 3:
+        star = (facts.get("出演") or "").split("、")[0]
+        if star:
+            recommend.append(f"{star}のファン")
+    recommend = recommend[:3]
+
+    highlights = []
+    if "アカデミー賞" in text:
+        highlights.append("アカデミー賞など賞レースでも話題になった評価作")
+    if "リメイク" in text:
+        highlights.append("各国でリメイクもされた世界的ヒット作")
+    if re.search(r"興行|大ヒット|収益", text):
+        highlights.append("公開当時、大きな話題とヒットを記録した1本")
+    theme_high = [
+        ("友情", "正反対の2人が育んでいく友情"),
+        ("ジャーナリスト", "戦場を駆けるジャーナリストたちの視点"),
+        ("スパイ", "スパイならではのガジェットと作戦"),
+        ("内戦", "内戦下を進む緊迫のロードムービー"),
+        ("宇宙", "宇宙を舞台にした壮大なスケールの物語"),
+    ]
+    for kw, phrase in theme_high:
+        if kw in text and phrase not in highlights:
+            highlights.append(phrase)
+        if len(highlights) >= 3:
+            break
+    rt = facts.get("上映時間") or ""
+    m2 = re.search(r"(\d+)\s*分", rt)
+    if m2 and len(highlights) < 3:
+        mins = int(m2.group(1))
+        if mins >= 150:
+            highlights.append(f"上映時間{mins}分の大作。じっくり観たい日に")
+        elif mins <= 100:
+            highlights.append(f"上映時間{mins}分とコンパクトに観られる")
+    music = (facts.get("音楽") or "").split("、")[0]
+    if music and len(highlights) < 3:
+        highlights.append(f"音楽は{music}が担当")
+    highlights = highlights[:3]
+
+    intro = {"lead": lead}
+    if recommend:
+        intro["recommend"] = recommend
+    if highlights:
+        intro["highlights"] = highlights
+    return intro
+
+
 def find_trailer(title, year):
     """公式予告編のYouTube IDを返す。確信が持てなければ None（手動で紐づける）。
     失敗しても下書き作成は止めない（呼び出し側で例外を握る前提だが、ここでも握る）。"""
@@ -502,6 +590,10 @@ def main():
             "facts": [["製作年", f"{t['year']}年"]] + wiki_facts(info["page_title"]),
             "source": [f"Wikipedia「{info['page_title']}」", info["url"]],
         }
+        try:
+            draft["intro"] = make_intro(t["title"], t["year"], overview, draft["facts"])
+        except Exception as e:
+            print(f"  紹介ボックスの生成をスキップ: {e}")
         plot = wiki_plot(t["title"], t["year"])
         if plot:
             draft["spoiler_overview"] = (
