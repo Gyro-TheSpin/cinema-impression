@@ -26,6 +26,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 import urllib.parse
 import urllib.request
 
@@ -75,7 +76,9 @@ def _pick_page(pages, year, title=None):
     """候補ページの誤爆（同名の別作品・続編）を避けて選ぶ。
 
     優先順: ①ページタイトルが作品名と一致 ②リード文の最初の年が目標年±1
-    （公開年の地域差を許容） ③検索順の先頭。
+    （公開年の地域差を許容）。どちらにも当てはまらなければ None を返す
+    （検索順の先頭を拾うと別作品の下書きになるため、当てはまらない場合は
+    作らない方が安全。2026-11-13 の #564『インサイド・ヘッド２』事故の対策）。
     """
     if title:
         for p in pages:
@@ -85,7 +88,7 @@ def _pick_page(pages, year, title=None):
         m = re.search(r"(\d{4})年", p.get("extract") or "")
         if m and abs(int(m.group(1)) - int(year)) <= 1:
             return p
-    return pages[0] if pages else None
+    return None
 
 
 def _page_by_title(title, intro_only=True):
@@ -147,6 +150,10 @@ def _section_lines(text, section):
 
 def wiki_summary(title, year):
     """日本語版 Wikipedia で作品ページを探し、リード文とURLと基本情報を返す。"""
+    # キューのタイトルは全角（「２」「：」等）で、Wikipedia のページ名は
+    # 半角のことがある。NFKC 正規化してから引かないと完全一致が外れ、
+    # 検索フォールバックで別作品を掴む事故になる（#564 の原因）。
+    title = unicodedata.normalize("NFKC", title)
     page = _page_by_title(title, intro_only=True)
     if page is None:
         pages = _search_pages(title, limit=5, intro_only=True)
@@ -251,6 +258,7 @@ NEXT_HEADINGS = ["登場人物", "キャスト", "声の出演", "スタッフ",
 
 def wiki_plot(title, year=None):
     """Wikipedia全文から「あらすじ」セクション（結末まで含む）を切り出す。見つからなければ None。"""
+    title = unicodedata.normalize("NFKC", title)  # wiki_summary と同じ理由
 
     def heading(ln):
         # Wikipediaのexplaintextは見出しを "== ストーリー ==" の形で返すため
