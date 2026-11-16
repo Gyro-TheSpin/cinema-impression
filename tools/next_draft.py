@@ -91,6 +91,110 @@ def _pick_page(pages, year, title=None):
     return None
 
 
+# 同名の原作メディア（漫画・ドラマ・アニメ・小説）が先に立つ記事の判定キーワード。
+# リード文の冒頭にこれらがあれば、記事内の「映画」セクションへ差し替える対象。
+MEDIA_KEYWORDS = ("漫画作品", "テレビドラマ", "テレビアニメ", "小説")
+
+
+def _lead_year(extract):
+    # 年の判定はリード文（冒頭600字）だけを見る。全文だと無関係な年
+    # （例：数字「7」の記事が言及する映画『セブン』の公開年1995）に
+    # 引っ張られて誤判定する。
+    m = re.search(r"(\d{4})年", (extract or "")[:600])
+    return int(m.group(1)) if m else None
+
+
+def _year_ok(extract, year):
+    y = _lead_year(extract)
+    return y is not None and abs(y - int(year)) <= 1
+
+
+def _year_ok_loose(extract, year):
+    """リード冒頭の年のうち最初の3つに目標年±1があればOKとする緩い判定。
+
+    「(映画)」専用ページ向け。映画記事のリードは原作小説の出版年などから
+    書き始めることがあり（例：『ハリー・ポッターと賢者の石 (映画)』は
+    1997年→2001年の順）、最初の年だけで判定すると正しい映画記事を
+    落としてしまう。素のタイトルページ判定には使わない（原作記事の
+    リードにも映画化の年が混ざるため）。
+    """
+    years = re.findall(r"(\d{4})年", (extract or "")[:600])[:3]
+    return any(abs(int(y) - int(year)) <= 1 for y in years)
+
+
+def _to_katakana(s):
+    """ひらがなをカタカナに寄せる（Filmarks表記とWikipedia記事名の差の吸収用）。"""
+    return "".join(chr(ord(c) + 0x60) if "ぁ" <= c <= "ゖ" else c for c in s)
+
+
+def _title_variants(title):
+    """表記ゆれの候補タイトル（元→先頭1文字のみカタカナ化→全カタカナ化）。
+
+    『べイビーわるきゅーれ』(Filmarks) と『ベイビーわるきゅーれ』(Wikipedia)
+    のように先頭1文字だけ脚本が違うケースがある。全カタカナ化すると
+    『ベイビーワルキューレ』になってしまうため、先頭1文字版を先に試す。
+    """
+    out = [title]
+    if title and "ぁ" <= title[0] <= "ゖ":
+        out.append(chr(ord(title[0]) + 0x60) + title[1:])
+    kata = _to_katakana(title)
+    if kata not in out:
+        out.append(kata)
+    return out
+
+
+def _resolve_page(title, year, intro_only=True):
+    """映画記事として正しい Wikipedia ページを返す。取れなければ None。
+
+    Filmarks と Wikipedia でタイトルの表記（ひらがな/カタカナ）が違う
+    ケースがあるため、通常の解決で取れなければ表記バリアントでも試す。
+    キュー側のタイトルは Filmarks 表記のまま（週次同期の照合キーと
+    一致させるため、キューは書き換えない）。
+    """
+    title = unicodedata.normalize("NFKC", title)
+    for variant in _title_variants(title):
+        page = _resolve_page_once(variant, year, intro_only)
+        if page is not None:
+            return page
+    return None
+
+
+def _resolve_page_once(title, year, intro_only=True):
+    """_resolve_page の実体（1表記分）。
+
+    タイトル完全一致でも映画記事とは限らない（一般概念・数字・都市伝説など
+    同名記事の誤爆が 2026-11-16 の #556『ミッシング』#557『セブン』
+    #558『メン・イン・ブラック』で発生）。完全一致ページにもリード文の
+    年チェックを適用し、外れたら「{タイトル} (映画)」「{タイトル} ({年}年の
+    映画)」の専用ページを試す。専用ページが無く原作メディア記事に映画
+    セクションがある型（『ミステリと言う勿れ』『死刑にいたる病』）は
+    元ページを返し、概要側で映画セクションに差し替える。それ以外は
+    検索フォールバック（_pick_page）に委ねる。
+    """
+    title = unicodedata.normalize("NFKC", title)
+    page = _page_by_title(title, intro_only=intro_only)
+    if page is not None:
+        ex = page.get("extract") or ""
+        if _year_ok(ex, year):
+            return page
+        for cand in (f"{title} (映画)", f"{title} ({year}年の映画)"):
+            p2 = _page_by_title(cand, intro_only=intro_only)
+            if p2 is not None and (
+                cand == f"{title} ({year}年の映画)"
+                or _year_ok_loose(p2.get("extract") or "", year)
+            ):
+                return p2
+        if any(k in ex[:200] for k in MEDIA_KEYWORDS):
+            return page
+    try:
+        pages = _search_pages(title, limit=5, intro_only=intro_only)
+    except Exception:
+        return None
+    if not pages:
+        return None
+    return _pick_page(pages, year, title)
+
+
 def _page_by_title(title, intro_only=True):
     """タイトル完全一致でページを直接引く（曖昧さ回避ページは None）。"""
     api = "https://ja.wikipedia.org/w/api.php"
@@ -154,18 +258,15 @@ def wiki_summary(title, year):
     # 半角のことがある。NFKC 正規化してから引かないと完全一致が外れ、
     # 検索フォールバックで別作品を掴む事故になる（#564 の原因）。
     title = unicodedata.normalize("NFKC", title)
-    page = _page_by_title(title, intro_only=True)
+    page = _resolve_page(title, year, intro_only=True)
     if page is None:
-        pages = _search_pages(title, limit=5, intro_only=True)
-        if not pages:
-            return None
-        page = _pick_page(pages, year, title)
+        return None
     extract = (page.get("extract") or "").strip()
-    # 同名の漫画・ドラマ記事が先に立つ場合、リード文は漫画の説明になる
+    # 同名の漫画・ドラマ・小説記事が先に立つ場合、リード文は原作の説明になる
     # （例：『ミステリと言う勿れ』は「田村由美による日本の漫画作品」）。
     # その場合は記事内の「映画」セクションの冒頭文に差し替える。
-    if any(k in extract[:200] for k in ("漫画作品", "テレビドラマ", "テレビアニメ")):
-        full = _page_by_title(title, intro_only=False)
+    if any(k in extract[:200] for k in MEDIA_KEYWORDS):
+        full = _page_by_title(page.get("title") or title, intro_only=False)
         if full is not None:
             sec = _section_lines(full.get("extract") or "", "映画")
             if sec:
@@ -256,8 +357,13 @@ def wiki_facts(page_title):
 NEXT_HEADINGS = ["登場人物", "キャスト", "声の出演", "スタッフ", "制作", "製作", "公開", "評価", "興行成績", "脚注", "出典", "関連項目", "外部リンク", "主題歌", "音楽"]
 
 
-def wiki_plot(title, year=None):
-    """Wikipedia全文から「あらすじ」セクション（結末まで含む）を切り出す。見つからなければ None。"""
+def wiki_plot(title, year=None, page_title=None):
+    """Wikipedia全文から「あらすじ」セクション（結末まで含む）を切り出す。見つからなければ None。
+
+    page_title が渡されたらそのページを最優先する（概要・作品情報と
+    同じ記事から取るため。タイトルから再解決すると同名の別記事に
+    ズレることがある）。
+    """
     title = unicodedata.normalize("NFKC", title)  # wiki_summary と同じ理由
 
     def heading(ln):
@@ -265,15 +371,15 @@ def wiki_plot(title, year=None):
         # "=" と空白を除いて見出し名だけを取り出す
         return ln.strip("= ").strip()
 
-    page = _page_by_title(title, intro_only=False)
+    page = None
+    if page_title:
+        page = _page_by_title(page_title, intro_only=False)
+    if page is None and year:
+        page = _resolve_page(title, year, intro_only=False)
     if page is None:
-        try:
-            pages = _search_pages(title, limit=5, intro_only=False)
-        except Exception:
-            return None
-        if not pages:
-            return None
-        page = _pick_page(pages, year, title) if year else pages[0]
+        page = _page_by_title(title, intro_only=False)
+    if page is None:
+        return None
     text = page.get("extract") or ""
     # 映画セクションがある記事（漫画・ドラマと同名）は、その中の「あらすじ」を使う。
     # 全文の先頭から探すと漫画の「あらすじ」（全話分）を拾ってしまうため。
@@ -571,7 +677,7 @@ def main():
             draft["intro"] = make_intro(t["title"], t["year"], overview, draft["facts"])
         except Exception as e:
             print(f"  紹介ボックスの生成をスキップ: {e}")
-        plot = wiki_plot(t["title"], t["year"])
+        plot = wiki_plot(t["title"], t["year"], page_title=info["page_title"])
         if plot:
             draft["spoiler_overview"] = (
                 summarize_spoiler_with_gemini(t["title"], plot) or first_sentences(plot, limit=1500)
