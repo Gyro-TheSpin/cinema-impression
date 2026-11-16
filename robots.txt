@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gyro-thespin.github.io/cinema-impression/sitemap.xml
+Sitemap: https://cinema-impression.tech/sitemap.xml

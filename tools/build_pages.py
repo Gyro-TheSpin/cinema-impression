@@ -98,7 +98,7 @@ TEMPLATE = """<!DOCTYPE html>
 <meta property="og:site_name" content="山田太郎シネマ">
 <meta property="og:title" content="{title}（{year}）の感想と考察｜山田太郎シネマ">
 <meta property="og:description" content="{title}（{year}年）のあらすじ、作品情報、感想と考察。">
-<meta property="og:url" content="https://gyro-thespin.github.io/cinema-impression/articles/{no}.html">
+<meta property="og:url" content="https://cinema-impression.tech/articles/{no}.html">
 <script>document.documentElement.className += ' js';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -306,7 +306,7 @@ def build_all():
         with open(os.path.join(outdir, f"{no}.html"), "w", encoding="utf-8") as f:
             f.write(page)
         made.append(no)
-    base = "https://gyro-thespin.github.io/cinema-impression/"
+    base = "https://cinema-impression.tech/"
     urls = [base, base + "privacy.html"] + [base + f"articles/{n}.html" for n in sorted(made)]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     sm += [f"<url><loc>{u}</loc></url>" for u in urls]
