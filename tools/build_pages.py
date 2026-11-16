@@ -125,10 +125,6 @@ TEMPLATE = """<!DOCTYPE html>
 <div class="src">出典：<a href="{source_url}" target="_blank" rel="noopener">{source_name}</a>（事実情報を整理して記載）</div>
 <h2>{icon_reel}作品情報</h2>
 <div class="factbox">{facts}</div>
-<h2>{icon_bang}ネタバレあり｜詳しいあらすじ</h2>
-<div class="spoil">ここから先は結末まで含むネタバレです。未見の方はご注意ください。</div>
-{spoiler}
-<div class="src">あらすじの出典：<a href="{source_url}" target="_blank" rel="noopener">{source_name}</a>（事実情報を整理して記載）</div>
 <h2>{icon_crown}感想</h2>
 {impression}
 {analysis_block}
@@ -298,7 +294,6 @@ def build_all():
             "{facts}": facts,
             "{impression}": impression_html(no, d.get("impression")),
             "{analysis_block}": ("<h2>" + ICON_SCOPE + "考察</h2>\n" + para(d.get("analysis"))) if (d.get("analysis") or "").strip() else "",
-            "{spoiler}": para(regroup(d.get("spoiler_overview"), per=2, min_split=0)),
         }
         page = TEMPLATE
         for k, v in tokens.items():
