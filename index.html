@@ -378,7 +378,7 @@ function renderQueue() {
   list.slice(0, shown).forEach(f => {
     const li = document.createElement("li");
     const dd = DRAFTS[f.no];
-    const chip = dd && dd.published ? '<span class="chip ok">公開中</span>' : dd ? '<span class="chip mid">レビューあり</span>' : '<span class="chip">準備中</span>';
+    const chip = dd && dd.published ? '<span class="chip ok">公開中</span>' : dd ? '<span class="chip mid">あらすじあり</span>' : '<span class="chip">準備中</span>';
     li.innerHTML = '<span class="q-main"><span class="q-title">' + esc(f.title) + '</span><br><span class="q-sub">' + f.year + "年製作</span></span>" + chip;
     if (dd) {
       li.addEventListener("click", () => { location.href = "articles/" + f.no + ".html"; });
