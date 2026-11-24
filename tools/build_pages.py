@@ -105,7 +105,7 @@ TEMPLATE = """<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>{css}</style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8421034128476891" crossorigin="anonymous"></script>
-</head>
+{robots_meta}</head>
 <body>
 <div class="sheet">
 <header class="site">
@@ -293,6 +293,7 @@ def build_all():
             "{source_name}": esc(d["source"][0]) if d.get("source") else "",
             "{source_url}": esc(d["source"][1]) if d.get("source") else "#",
             "{facts}": facts,
+            "{robots_meta}": "" if d.get("published") else '<meta name="robots" content="noindex">\n',
             "{impression}": impression_html(no, d.get("impression")),
             "{analysis_block}": ("<h2>" + ICON_SCOPE + "考察</h2>\n" + para(d.get("analysis"))) if (d.get("analysis") or "").strip() else "",
         }
@@ -302,8 +303,9 @@ def build_all():
         with open(os.path.join(outdir, f"{no}.html"), "w", encoding="utf-8") as f:
             f.write(page)
         made.append(no)
+    published_made = [n for n in made if drafts[n].get("published")]
     base = "https://cinema-impression.tech/"
-    urls = [base, base + "privacy.html"] + [base + f"articles/{n}.html" for n in sorted(made)]
+    urls = [base, base + "privacy.html"] + [base + f"articles/{n}.html" for n in sorted(published_made, key=int)]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     sm += [f"<url><loc>{u}</loc></url>" for u in urls]
     sm.append("</urlset>")

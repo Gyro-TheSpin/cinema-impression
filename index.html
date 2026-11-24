@@ -335,7 +335,7 @@ const dots = s => s ? s.replace(/-/g, ".") : "";
 (() => {
   const wrap = $("#nextCards");
   const grads = ["linear-gradient(135deg,#f0685e,#d92f24)", "linear-gradient(135deg,#5d88e8,#2f55b8)", "linear-gradient(135deg,#55b877,#2c7f47)", "linear-gradient(135deg,#b07fd4,#7a4ba8)", "linear-gradient(135deg,#e8a34c,#b96f1e)"];
-  FILMS.filter(f => DRAFTS[f.no]).slice(0, 3).forEach((f, i) => {
+  FILMS.filter(f => DRAFTS[f.no] && DRAFTS[f.no].published).slice(0, 3).forEach((f, i) => {
     const d = DRAFTS[f.no];
     const a = document.createElement("a");
     a.className = "jcard rv";
@@ -380,7 +380,7 @@ function renderQueue() {
     const dd = DRAFTS[f.no];
     const chip = dd && dd.published ? '<span class="chip ok">公開中</span>' : dd ? '<span class="chip mid">あらすじあり</span>' : '<span class="chip">準備中</span>';
     li.innerHTML = '<span class="q-main"><span class="q-title">' + esc(f.title) + '</span><br><span class="q-sub">' + f.year + "年製作</span></span>" + chip;
-    if (dd) {
+    if (dd && dd.published) {
       li.addEventListener("click", () => { location.href = "articles/" + f.no + ".html"; });
     } else {
       li.style.cursor = "default";
